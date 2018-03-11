@@ -29,5 +29,8 @@ $application = new Application();
 // Extend application with the module.
 $application->extend(\SimpleModule::class);
 
-// Run the application.
-$application->run(new Server());
+if (php_sapi_name() == 'cli-server') {
+    $application->run();
+} else {
+    $application->run(new Server());
+}

@@ -300,6 +300,7 @@ implementation will be used as default) to register additional services.
 
 ## Igni's server
 
+
 ## External webserver
 
 ### Apache
@@ -364,4 +365,32 @@ server {
     error_log /var/log/nginx/project_error.log;
     access_log /var/log/nginx/project_access.log;
 }
+```
+
+### PHP built-in webserver
+
+PHP ships with a built-in webserver for development. This server allows you to run Igni without any configuration. 
+
+```php
+<?php
+require_once __DIR__.'/vendor/autoload.php';
+
+// Setup application and routes
+$application = new Igni\Http\Application();
+$application->get('/hello/{name}', function (\Psr\Http\Message\ServerRequestInterface $request) : \Psr\Http\Message\ResponseInterface {
+    return \Igni\Http\Response::fromText("Hello {$request->getAttribute('name')}");
+});
+
+// Run with the server
+if (php_sapi_name() == 'cli-server') {
+    $application->run();
+} else {
+    $application->run(new Igni\Http\Server());
+}
+```
+
+Assuming your front controller is at ./index.php, you can start the server using the following command:
+
+```
+php -S localhost:8080 index.php 
 ```
