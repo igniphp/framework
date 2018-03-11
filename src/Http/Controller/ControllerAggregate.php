@@ -26,7 +26,18 @@ class ControllerAggregate implements ControllerAggregateInterface
             return;
         }
 
-        if (is_a($controller, Controller::class)) {
+        if ($controller instanceof Controller) {
+            /** @var Route $route */
+            $route = $controller::getRoute();
+            $route->delegate($controller);
+            $this->router->addRoute($route);
+            return;
+        }
+
+        if (is_string($controller) &&
+            class_exists($controller) &&
+            in_array(Controller::class, class_implements($controller))
+        ) {
             /** @var Route $route */
             $route = $controller::getRoute();
             $route->delegate($controller);

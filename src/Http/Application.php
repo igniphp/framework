@@ -9,6 +9,7 @@ use Igni\Application\Controller\ControllerAggregate as AbstractControllerAggrega
 use Igni\Application\Exception\ApplicationException;
 use Igni\Container\DependencyResolver;
 use Igni\Http\Controller\ControllerAggregate;
+use Igni\Http\Exception\HttpModuleException;
 use Igni\Http\Middleware\ErrorMiddleware;
 use Igni\Http\Server\OnRequestListener;
 use Psr\Container\ContainerInterface;
@@ -134,7 +135,10 @@ class Application
             $request = $request->withAttributes($route->getAttributes());
         }
 
-        if (is_string($controller) && class_exists($controller) && is_a($controller, Controller::class)) {
+        if (is_string($controller) &&
+            class_exists($controller) &&
+            in_array(Controller::class, class_implements($controller))
+        ) {
             /** @var Controller $instance */
             $instance = $this->dependencyResolver->resolve($controller);
             return $instance($request);

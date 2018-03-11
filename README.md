@@ -223,7 +223,7 @@ $application->run();
 Module is a reusable part of application or business logic. It can listen on application state or/and extend application 
 by providing additional middleware, services, models, libraries etc...
 
-In Igni module is any class implementing any listener or provider interface passed to `extend` method.
+In Igni module is any class implementing any listener or provider interface.
 
 The following list contains all possible interfaces that module can implement in order to provide additional 
 features for the application:
@@ -238,3 +238,60 @@ features for the application:
     - `Igni\Application\Providers\ControllerProvider` 
     - `Igni\Application\Providers\ServiceProvider` 
 
+Example:
+```php
+<?php
+require_once __DIR__.'/vendor/autoload.php';
+
+use Igni\Application\Controller\ControllerAggregate;
+use Igni\Application\Providers\ControllerProvider;
+use Igni\Http\Application;
+use Igni\Http\Response;
+use Igni\Http\Route;
+
+/**
+ * Module definition.
+ */
+class SimpleModule implements ControllerProvider
+{
+    public function provideControllers(ControllerAggregate $controllers): void
+    {
+        // Add controller that greets client when /hello/{name} URI is requested
+        $controllers->add(function ($request) {
+            return Response::fromText("Hello {$request->getAttribute('name')}!");
+        }, Route::get('/hello/{name}'));
+    }
+}
+
+$application = new Application();
+
+// Extend application with the module.
+$application->extend(\SimpleModule::class);
+
+// Run the application.
+$application->run();
+```
+
+### Listeners
+
+#### Boot Listener
+OnBootListener can be implemented to perform tasks on application in boot state.
+
+#### Run Listener
+OnRunListener can be implemented to perform tasks which are dependent on various services
+provided by extensions.
+
+#### Shutdown Listener
+Can be used for cleaning-up tasks.
+
+### Providers
+
+#### Config Provider
+Config provider is used to provide additional configuration settings to config service `\Igni\Application\Config`.  
+
+#### Controller Provider
+Controller provider is used to register controllers within the application.  
+
+#### Service Provider
+Makes usage of PSR compatible DI of your choice (If none is passed to application igniphp/container 
+implementation will be used as default) to register additional services.
