@@ -105,7 +105,7 @@ To create optional route parts, the optional part has to be enclosed in `[...]`.
 $application->get('/users/[{name}[/details]]', $controller);
 ```
 
-    Please note: Optional parts are only supported in a trailing position.
+ > Please note: Optional parts are only supported in a trailing position.
     
 Full example:
 ```php
