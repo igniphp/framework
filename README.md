@@ -177,8 +177,10 @@ Middleware can be used to:
 In Igni middleware can be any closure that accepts `\Psr\Http\Message\ServerRequestInterface` and `\Psr\Http\Server\RequestHandlerInterface` as parameters 
 and returns valid instance of `\Psr\Http\Message\ResponseInterface` or any class/object that implements `\Psr\Http\Server\MiddlewareInterface` interface.
 
-The following code is simple example of middleware that adds custom header to all responses: 
+You can add as many middleware as you want, and they are triggered in the same order as you add them. 
+In fact even `Igni\Http\Application` is a middleware itself which is automatically added at the end of the pipe.
 
+#### Example
 ```php
 <?php
 // Include composer's autoloader.
@@ -215,4 +217,24 @@ $application->use(function(ServerRequestInterface $request, RequestHandlerInterf
 // Run the application.
 $application->run();
 ```
+
+## Modules
+
+Module is a reusable part of application or business logic. It can listen on application state or/and extend application 
+by providing additional middleware, services, models, libraries etc...
+
+In Igni module is any class implementing any listener or provider interface passed to `extend` method.
+
+The following list contains all possible interfaces that module can implement in order to provide additional 
+features for the application:
+
+ - Listeners:
+    - `Igni\Application\Listeners\OnBootListener`
+    - `Igni\Application\Listeners\OnErrorListener`
+    - `Igni\Application\Listeners\OnRunListener`
+    - `Igni\Application\Listeners\OnShutdownListener`
+ - Providers:
+    - `Igni\Application\Providers\ConfigProvider` 
+    - `Igni\Application\Providers\ControllerProvider` 
+    - `Igni\Application\Providers\ServiceProvider` 
 

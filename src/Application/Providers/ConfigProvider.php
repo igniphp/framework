@@ -2,9 +2,9 @@
 
 namespace Igni\Application\Providers;
 
-use Igni\Application\ConfigInterface;
+use Igni\Application\Config;
 
 interface ConfigProvider
 {
-    public function provideConfig(ConfigInterface $config): void;
+    public function provideConfig(Config $config): void;
 }
