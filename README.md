@@ -107,10 +107,7 @@ $application->get('/users/[{name}[/details]]', $controller);
 
     Please note: Optional parts are only supported in a trailing position.
     
-## API reference
-Api that is exposed by `Igni\Http\Application`.
-
-### Routing
+Full example:
 ```php
 <?php
 // Include composer's autoloader.
@@ -167,7 +164,7 @@ Makes `$controller` to listen on `$route` pattern on http `OPTIONS` request.
 
 Makes `$controller` to listen on `$route` pattern on http `HEAD` request.
 
-### Middleware
+## Middleware
 
 Middleware is an individual component participating in processing incoming request and the creation
 of resulting response.
