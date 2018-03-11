@@ -18,7 +18,7 @@ Igni aims to be:
 ### Installation
 
 ``` 
-composer install igniphp/storage
+composer install igniphp/framework
 ```
 
 ### Usage
@@ -142,7 +142,7 @@ In case of error most often `406` (not acceptable), `409` (conflict) `413` (requ
 
 Makes `$controller` to listen on `$route` pattern on http `PUT` request.
 
-Should be used to update a specific resource (by an identifier) or a collection of resources. 
+Should be used to **update** a specific resource (by an identifier) or a collection of resources. 
 Can also be used to create a specific resource if the resource identifier is known before-hand.
 Response code scenario is same as `post` method with additional `404` if resource to update was not found.
 
@@ -150,15 +150,72 @@ Response code scenario is same as `post` method with additional `404` if resourc
 
 Makes `$controller` to listen on `$route` pattern on http `PATCH` request.
 
-As `patch` should be used for **modify** the resource. The difference is that `patch` request 
+As `patch` should be used for **modify** resource. The difference is that `patch` request 
 can contain only the changes to the resource, not the complete resource as `put` or `post`.
 
 #### `Application::delete(string $route, callable $controller)`
 
 Makes `$controller` to listen on `$route` pattern on http `DELETE` request.
 
+Should be used to **delete** resource.
+
 #### `Application::options(string $route, callable $controller)`
+
 Makes `$controller` to listen on `$route` pattern on http `OPTIONS` request.
 
 #### `Application::head(string $route, callable $controller)`
+
 Makes `$controller` to listen on `$route` pattern on http `HEAD` request.
+
+### Middleware
+
+Middleware is an individual component participating in processing incoming request and the creation
+of resulting response.
+
+Middleware can be used to:
+ - Handle authentication details
+ - Perform content negotiation
+ - Error handling
+
+In Igni middleware can be any closure that accepts `\Psr\Http\Message\ServerRequestInterface` and `\Psr\Http\Server\RequestHandlerInterface` as parameters 
+and returns valid instance of `\Psr\Http\Message\ResponseInterface` or any class/object that implements `\Psr\Http\Server\MiddlewareInterface` interface.
+
+The following code is simple example of middleware that adds custom header to all responses: 
+
+```php
+<?php
+// Include composer's autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\MiddlewareInterface;
+
+class BenchmarkMiddleware implements MiddlewareInterface
+{
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface 
+    {
+        $time = microtime();
+        $response = $next->handle($request);
+        $renderTime = microtime() - $time;
+        
+        return $response->withHeader('render-time', $renderTime);
+    }
+}
+
+$application = new Igni\Http\Application();
+
+// Attach custom middleware instance.
+$application->use(new BenchmarkMiddleware());
+
+// Attach closure middleware.
+$application->use(function(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface {
+    $response = $next->handle($request);
+    return $response->withHeader('foo', 'bar');
+});
+
+// Run the application.
+$application->run();
+```
+
