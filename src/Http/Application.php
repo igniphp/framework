@@ -11,7 +11,7 @@ use Igni\Container\DependencyResolver;
 use Igni\Http\Controller\ControllerAggregate;
 use Igni\Http\Exception\HttpModuleException;
 use Igni\Http\Middleware\ErrorMiddleware;
-use Igni\Http\Server\OnRequestListener;
+use Igni\Http\Server\OnRequest;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,7 +24,7 @@ use Throwable;
 
 class Application
     extends AbstractApplication
-    implements MiddlewareAggregate, MiddlewareInterface, RequestHandlerInterface, OnRequestListener {
+    implements MiddlewareAggregate, MiddlewareInterface, RequestHandlerInterface, OnRequest {
 
     /** @var Router */
     private $router;

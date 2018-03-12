@@ -300,6 +300,7 @@ implementation will be used as default) to register additional services.
 
 ## Igni's server
 
+Igni is shipped with Http server
 
 ## External webserver
 
@@ -394,3 +395,5 @@ Assuming your front controller is at ./index.php, you can start the server using
 ```
 php -S localhost:8080 index.php 
 ```
+
+ > Note: This should be used only for development.

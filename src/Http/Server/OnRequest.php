@@ -5,7 +5,10 @@ namespace Igni\Http\Server;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface OnRequestListener extends Listener
+/**
+ * The event happens when the worker process receives the request data.
+ */
+interface OnRequest extends Listener
 {
     public function onRequest(ServerRequestInterface $request): ResponseInterface;
 }

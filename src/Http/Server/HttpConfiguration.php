@@ -7,10 +7,12 @@ class HttpConfiguration
     public const DISPATCH_ROUND_ROBIN = 1;
     public const DISPATCH_MODULO = 2;
     public const DISPATCH_PREEMPTIVE_ASSIGNMENT = 3;
+    public const DEFAULT_ADDRESS = '0.0.0.0';
+    public const DEFAULT_PORT = 8080;
 
     private $settings = [];
 
-    public function __construct(string $address = '0.0.0.0', int $port = 8080)
+    public function __construct(string $address = self::DEFAULT_ADDRESS, int $port = self::DEFAULT_PORT)
     {
         $this->settings['address'] = $address;
         $this->settings['port'] = $port;
