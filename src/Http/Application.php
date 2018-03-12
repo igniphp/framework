@@ -66,7 +66,7 @@ class Application
 
         if ($server) {
             $server->addListener($this);
-            $server->run();
+            $server->start();
         } else {
             $response = $this->handle(ServerRequest::fromGlobals());
             $emitter = new SapiEmitter();

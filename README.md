@@ -300,7 +300,114 @@ implementation will be used as default) to register additional services.
 
 ## Igni's server
 
-Igni is shipped with Http server
+Igni is shipped with an async non-blocking IO, multiple process HTTP server. 
+The server requires `swoole` extension to be installed and enabled, 
+more information about swoole can be found [here](https://www.swoole.co.uk).
+
+### Installation
+
+Linux users:
+
+```
+pecl install swoole
+```
+
+Mac users with homebrew:
+
+```
+brew install swoole
+```
+or:
+```
+brew install homebrew/php/php71-swoole
+```
+
+### Basic Usage
+
+```php
+<?php
+// Autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+// Create server instance.
+$server = new \Igni\Http\Server();
+$server->start();
+```
+
+### Listeners
+
+Igni http server uses event-driven model that makes it easy to scale and extend.
+
+There are five type of events available, each of them extends `Igni\Http\Server\Listener` interface:
+
+ - `Igni\Http\Server\OnStart` fired when server starts
+ - `Igni\Http\Server\OnStop` fired when server stops
+ - `Igni\Http\Server\OnConnect` fired when new client connects to the server
+ - `Igni\Http\Server\OnClose` fired when connection with the client is closed
+ - `Igni\Http\Server\OnRequest` fired when new request is dispatched
+ 
+ ```php
+ <?php
+ // Autoloader.
+ require_once __DIR__.'/vendor/autoload.php';
+ 
+ // Create server instance.
+ $server = new \Igni\Http\Server();
+ 
+ // Each request will retrieve 'Hello' response
+ $server->addListener(new class implements \Igni\Http\Server\OnRequest {
+     public function onRequest(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface {
+        return \Igni\Http\Response::fromText('Hello');
+     }
+ });
+ $server->start();
+ ```
+
+### Configuration
+
+Server can be easily configured with `Igni\Http\Server\HttpConfiguration` class.
+
+Please consider following example:
+```php
+<?php
+// Autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+// Listen on localhost at port 80.
+$configuration = new \Igni\Http\Server\HttpConfiguration('0.0.0.0', 80);
+
+// Create server instance.
+$server = new \Igni\Http\Server($configuration);
+$server->start();
+```
+
+##### Enabling ssl support
+```php
+<?php
+// Autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+$configuration = new \Igni\Http\Server\HttpConfiguration();
+$configuration->enableSsl($certFile, $keyFile);
+
+// Create server instance.
+$server = new \Igni\Http\Server($configuration);
+$server->start();
+```
+
+##### Running server as a daemon
+```php
+<?php
+// Autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+$configuration = new \Igni\Http\Server\HttpConfiguration();
+$configuration->enableDaemon($pidFile);
+
+// Create server instance.
+$server = new \Igni\Http\Server($configuration);
+$server->start();
+```
 
 ## External webserver
 

@@ -77,7 +77,7 @@ class Server
         return new ServerStats($this->handler->stats());
     }
 
-    public function run(): void
+    public function start(): void
     {
         $this->handler->start();
     }
