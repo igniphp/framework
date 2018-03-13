@@ -1,12 +1,11 @@
 <?php
-require_once __DIR__.'/../vendor/autoload.php';
+namespace Examples\Modules;
 
+use Examples\Controllers\GoodbyeController;
 use Igni\Application\Controller\ControllerAggregate;
 use Igni\Application\Providers\ControllerProvider;
-use Igni\Http\Application;
 use Igni\Http\Response;
 use Igni\Http\Route;
-use Igni\Http\Server;
 
 /**
  * Module definition.
@@ -21,16 +20,7 @@ class SimpleModule implements ControllerProvider
         $controllers->add(function ($request) {
             return Response::fromText("Hello {$request->getAttribute('name')}!");
         }, Route::get('/hello/{name}'));
+
+        $controllers->add(GoodbyeController::class);
     }
-}
-
-$application = new Application();
-
-// Extend application with the module.
-$application->extend(\SimpleModule::class);
-
-if (php_sapi_name() == 'cli-server') {
-    $application->run();
-} else {
-    $application->run(new Server());
 }
