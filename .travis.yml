@@ -8,7 +8,9 @@ php:
   - nightly
 
 before_install:
+  - pecl install swoole
   - composer self-update
+
 install:
   - composer update
 

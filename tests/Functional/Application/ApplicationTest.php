@@ -35,13 +35,6 @@ final class ApplicationTest extends TestCase
         self::assertFalse($application->onShutDown);
         self::assertTrue($application->getControllerAggregate()->has('test_controller'));
     }
-
-    public function testFromIni(): void
-    {
-        $application = Application::fromIni(__DIR__ . '/../../Fixtures/http.ini');
-
-        self::assertInstanceOf(\Igni\Http\Application::class, $application);
-    }
 }
 
 
