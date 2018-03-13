@@ -299,7 +299,37 @@ Controller provider is used to register controllers within the application.
 Makes usage of PSR compatible DI of your choice (If none is passed to application igniphp/container 
 implementation will be used as default) to register additional services.
 
-## Controllers
+## The Request
+Igni's controllers and middleware are given a PSR-7 server request object that represents http request send 
+by the client. Request contains route's params, body, request method, request uri and so on.
+
+For information how to work with PSR-7 [read this](https://www.php-fig.org/psr/psr-7/). 
+
+## The Response
+Igni's controllers and middleware must return valid PSR-7 response object. 
+Igni's `Igni\Http\Response` class provides factories methods to simplify response creation.
+
+#### `Response::empty(int $status = 200, array $headers = [])`
+
+Creates empty PSR-7 response object.
+
+#### `Response::fromText(string $text, int $status = 200, array $headers = [])`
+
+Creates PSR-7 request with content type set to `text/plain` and body containing passed `$text`
+
+#### `Response::fromJson($data, int $status = 200, array $headers = [])`
+
+Creates PSR-7 request with content type set to `application/json` and body containing json data.
+`$data` can be array or `\JsonSerializable` instance.
+
+#### `Response::fromHtml(string $html, int $status = 200, array $headers = [])`
+
+Creates PSR-7 request with content type set to `text/html` and body containing passed html.
+
+#### `Response::fromXml($data, int $status = 200, array $headers = [])`
+
+Creates PSR-7 request with content type set to `application/xml` and body containing xml string.
+`$data` can be `\SimpleXMLElement`, `\DOMDocument` or just plain string.
 
 ## Igni's server
 
