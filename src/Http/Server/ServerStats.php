@@ -11,6 +11,11 @@ class ServerStats
 {
     private $stats;
 
+    /**
+     * ServerStats constructor.
+     *
+     * @param array $stats
+     */
     public function __construct(array $stats)
     {
         $this->stats = $stats;

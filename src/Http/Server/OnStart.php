@@ -9,5 +9,10 @@ use Igni\Http\Server;
  */
 interface OnStart extends Listener
 {
+    /**
+     * Handles server's start event.
+     *
+     * @param Server $server
+     */
     public function onStart(Server $server): void;
 }

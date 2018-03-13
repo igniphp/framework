@@ -9,5 +9,11 @@ use Igni\Http\Server;
  */
 interface OnConnect extends Listener
 {
+    /**
+     * Handles connect server event.
+     *
+     * @param Server $server
+     * @param int $clientId
+     */
     public function onConnect(Server $server, int $clientId): void;
 }

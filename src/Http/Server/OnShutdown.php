@@ -11,5 +11,10 @@ use Igni\Http\Server;
  */
 interface OnShutdown extends Listener
 {
+    /**
+     * Handles server's shutdown event.
+     * 
+     * @param Server $server
+     */
     public function onShutdown(Server $server): void;
 }

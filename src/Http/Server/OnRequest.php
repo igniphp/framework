@@ -10,5 +10,11 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 interface OnRequest extends Listener
 {
+    /**
+     * Handles client request.
+     *
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
     public function onRequest(ServerRequestInterface $request): ResponseInterface;
 }

@@ -9,5 +9,11 @@ use Igni\Http\Server;
  */
 interface OnClose extends Listener
 {
+    /**
+     * Handles server close event.
+     *
+     * @param Server $server
+     * @param int $clientId
+     */
     public function onClose(Server $server, int $clientId): void;
 }
