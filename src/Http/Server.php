@@ -21,30 +21,113 @@ class Server
 {
     private const SWOOLE_EXT_NAME = 'swoole';
 
+    /**
+     * @var Swoole\Server|null
+     */
     private $handler;
 
-    public function __construct(HttpConfiguration $configuration = null)
+    /**
+     * @var HttpConfiguration
+     */
+    private $settings;
+
+    /**
+     * @var Listener[]
+     */
+    private $listeners;
+
+    public function __construct(HttpConfiguration $settings = null)
     {
         if (!extension_loaded(self::SWOOLE_EXT_NAME)) {
             throw new RuntimeException('Could not run server without swoole extension.');
         }
 
-        if ($configuration === null) {
-            $configuration = new HttpConfiguration();
+        if ($settings === null) {
+            $settings = new HttpConfiguration();
         }
 
-        if ($configuration->isSslEnabled()) {
+        $this->settings= $settings;
+    }
+
+    /**
+     * Adds listener that is attached to server once it is run.
+     *
+     * @param Listener $listener
+     */
+    public function addListener(Listener $listener): void
+    {
+        $this->listeners[] = $listener;
+        if ($this->handler !== null) {
+            $this->attachListener($listener);
+        }
+    }
+
+    /**
+     * Checks if listener exists.
+     *
+     * @param Listener $listener
+     * @return bool
+     */
+    public function hasListener(Listener $listener): bool
+    {
+        return in_array($listener, $this->listeners);
+    }
+
+    /**
+     * Returns information about client.
+     *
+     * @param int $clientId
+     * @return ClientStats
+     */
+    public function getClientStats(int $clientId): ClientStats
+    {
+        return new ClientStats($this->handler->getClientInfo($clientId));
+    }
+
+    /**
+     * Returns information about server.
+     *
+     * @return ServerStats
+     */
+    public function getServerStats(): ServerStats
+    {
+        return new ServerStats($this->handler->stats());
+    }
+
+    /**
+     * Starts the server.
+     */
+    public function start(): void
+    {
+        // Create swoole's server instance.
+        if ($this->settings->isSslEnabled()) {
             $flags = SWOOLE_SOCK_TCP | SWOOLE_SSL;
         } else {
             $flags = SWOOLE_SOCK_TCP;
         }
-
-        $settings = $configuration->getSettings();
+        $settings = $this->settings->getSettings();
         $this->handler = new Swoole\Http\Server($settings['address'], $settings['port'], SWOOLE_PROCESS, $flags);
         $this->handler->set($settings);
+
+        // Attach listeners.
+        foreach ($this->listeners as $listener) {
+            $this->attachListener($listener);
+        }
+
+        // Start the server.
+        $this->handler->start();
     }
 
-    public function addListener(Listener $listener): void
+    /**
+     * Stops the server.
+     */
+    public function stop(): void
+    {
+        $this->handler->shutdown();
+        $this->handler = null;
+    }
+
+    private function attachListener(Listener $listener): void
     {
         if ($listener instanceof OnRequest) {
             $this->attachOnRequestListener($listener);
@@ -65,26 +148,6 @@ class Server
         if ($listener instanceof OnStart) {
             $this->attachOnStartListener($listener);
         }
-    }
-
-    public function getClientStats(int $clientId): ClientStats
-    {
-        return new ClientStats($this->handler->getClientInfo($clientId));
-    }
-
-    public function getServerStats(): ServerStats
-    {
-        return new ServerStats($this->handler->stats());
-    }
-
-    public function start(): void
-    {
-        $this->handler->start();
-    }
-
-    public function stop(): void
-    {
-        $this->handler->shutdown();
     }
 
     private function attachOnRequestListener(OnRequest $listener): void

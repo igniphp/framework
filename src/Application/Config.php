@@ -8,6 +8,15 @@ use Igni\IO\File\Ini;
 use Igni\IO\Path;
 use Igni\Utils\ArrayUtil;
 
+/**
+ * Application's config container.
+ * @example:
+ * $config = new Config();
+ * $config->set('some.key', true);
+ * $some = $config->get('some'); // returns ['key' => true]
+ *
+ * @package Igni\Application
+ */
 class Config
 {
     private const PROTOTYPES = [
@@ -56,11 +65,22 @@ class Config
      */
     private $config;
 
+    /**
+     * Config constructor.
+     *
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         $this->config = $config;
     }
 
+    /**
+     * Checks if config key exists.
+     *
+     * @param string $key
+     * @return bool
+     */
     public function has(string $key): bool
     {
         return ArrayUtil::exists($this->config, $key);
