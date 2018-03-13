@@ -2,6 +2,10 @@
 
 namespace Igni\Http\Server;
 
+/**
+ * Class HttpConfiguration
+ * @package Igni\Http\Server
+ */
 class HttpConfiguration
 {
     public const DISPATCH_ROUND_ROBIN = 1;
@@ -10,14 +14,28 @@ class HttpConfiguration
     public const DEFAULT_ADDRESS = '0.0.0.0';
     public const DEFAULT_PORT = 8080;
 
+    /**
+     * @var array
+     */
     private $settings = [];
 
+    /**
+     * HttpConfiguration constructor.
+     *
+     * @param string $address
+     * @param int $port
+     */
     public function __construct(string $address = self::DEFAULT_ADDRESS, int $port = self::DEFAULT_PORT)
     {
         $this->settings['address'] = $address;
         $this->settings['port'] = $port;
     }
 
+    /**
+     * Checks if ssl is enabled.
+     *
+     * @return bool
+     */
     public function isSslEnabled(): bool
     {
         return isset($this->settings['ssl_cert_file']);
@@ -132,6 +150,11 @@ class HttpConfiguration
         $this->settings['upload_tmp_dir'] = $dir;
     }
 
+    /**
+     * Returns swoole compatible settings array.
+     *
+     * @return array
+     */
     public function getSettings(): array
     {
         return $this->settings;

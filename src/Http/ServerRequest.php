@@ -2,7 +2,6 @@
 
 namespace Igni\Http;
 
-use Igni\Utils\ArrayUtil;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -10,26 +9,40 @@ use Zend\Diactoros\ServerRequestFactory;
 
 class ServerRequest extends Request implements ServerRequestInterface
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     private $attributes = [];
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $cookieParams = [];
 
-    /** @var null|array|object */
+    /**
+     * @var null|array|object
+     */
     private $parsedBody;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $queryParams = [];
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $serverParams;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $uploadedFiles;
 
 
     /**
+     * Server request constructor.
+     *
      * @param array $serverParams Server parameters, typically from $_SERVER
      * @param array $uploadedFiles Upload file information, a tree of UploadedFiles
      * @param null|string $uri URI for the request, if any.

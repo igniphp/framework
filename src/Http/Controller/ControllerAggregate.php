@@ -8,16 +8,35 @@ use Igni\Http\Controller;
 use Igni\Http\Route;
 use Igni\Http\Router;
 
+/**
+ * Http application's controller aggregate.
+ * @see \Igni\Application\Controller
+ * @package Igni\Http\Controller
+ */
 class ControllerAggregate implements ControllerAggregateInterface
 {
-    /** @var Router */
+    /**
+     * @var Router
+     */
     private $router;
 
+    /**
+     * ControllerAggregate constructor.
+     * @param Router $router
+     */
     public function __construct(Router $router)
     {
         $this->router = $router;
     }
 
+    /**
+     * Registers new controller and attaches it to passed route.
+     *
+     * @param callable|string $controller can be either callable or class implementing Igni\Http\Controller interface or its instance.
+     * @param Route|null $route must be passed if callable is passed as a controller.
+     *
+     * @throws ApplicationException if passed controller is not valid.
+     */
     public function add($controller, Route $route = null): void
     {
         if (is_callable($controller) && $route !== null) {

@@ -10,6 +10,13 @@ use Zend\Diactoros\MessageTrait;
 use Zend\Diactoros\RequestTrait;
 use Zend\Diactoros\Uri;
 
+/**
+ * PSR-7 implementation of RequestInterface.
+ * Utilizes zend/diactoros implementation.
+ *
+ * @see RequestInterface
+ * @package Igni\Http
+ */
 class Request implements RequestInterface
 {
     use MessageTrait, RequestTrait;
@@ -28,6 +35,8 @@ class Request implements RequestInterface
     private $stream;
 
     /**
+     * Request constructor.
+     *
      * @param null|string $uri URI for the request, if any.
      * @param string $method HTTP method for the request, if any.
      * @param string|resource|StreamInterface $body Output body, if any.

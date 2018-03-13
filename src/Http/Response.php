@@ -8,6 +8,13 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Zend\Diactoros\MessageTrait;
 
+/**
+ * PSR-7 implementation of ResponseInterface.
+ * Utilizes zend/diactoros implementation.
+ *
+ * @see ResponseInterface
+ * @package Igni\Http
+ */
 class Response implements ResponseInterface
 {
     use MessageTrait;
@@ -145,12 +152,19 @@ class Response implements ResponseInterface
         511 => 'Network Authentication Required',
     ];
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $reasonPhrase = '';
 
-    /** @var int */
+    /**
+     * @var int
+     */
     private $statusCode;
 
+    /**
+     * @var bool
+     */
     private $complete = false;
 
     /**
@@ -184,6 +198,8 @@ class Response implements ResponseInterface
     }
 
     /**
+     * Ends and closes response.
+     *
      * @return $this
      */
     public function end()
@@ -229,6 +245,8 @@ class Response implements ResponseInterface
     }
 
     /**
+     * Factories response instance from json data.
+     *
      * @param array|\JsonSerializable $data
      * @param int $status
      * @param array $headers
@@ -248,6 +266,8 @@ class Response implements ResponseInterface
     }
 
     /**
+     * Factories response instance from text.
+     *
      * @param string $text
      * @param int $status
      * @param array $headers
@@ -260,6 +280,8 @@ class Response implements ResponseInterface
     }
 
     /**
+     * Factories response from html text.
+     *
      * @param string $html
      * @param int $status
      * @param array $headers
@@ -272,6 +294,8 @@ class Response implements ResponseInterface
     }
 
     /**
+     * Factories xml response.
+     *
      * @param \SimpleXMLElement|\DOMDocument|string $data
      * @param int $status
      * @param array $headers
@@ -294,6 +318,13 @@ class Response implements ResponseInterface
         return new Response($body, $status, $headers);
     }
 
+    /**
+     * Factories empty response.
+     *
+     * @param int $status
+     * @param array $headers
+     * @return Response
+     */
     public static function empty(int $status = self::HTTP_OK, array $headers = [])
     {
         return new Response('', $status, $headers);

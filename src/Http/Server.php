@@ -16,6 +16,8 @@ use Swoole;
 
 /**
  * Http server implementation based on swoole extension.
+ *
+ * @package Igni\Http
  */
 class Server
 {

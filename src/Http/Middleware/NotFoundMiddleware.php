@@ -9,8 +9,20 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
+/**
+ * Middleware for generating default response in case application cannot find route definition for client's request.
+ *
+ * @package Igni\Http\Middleware
+ */
 final class NotFoundMiddleware implements MiddlewareInterface
 {
+    /**
+     * @see MiddlewareInterface::process()
+     *
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $next
+     * @return ResponseInterface
+     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface
     {
         try {

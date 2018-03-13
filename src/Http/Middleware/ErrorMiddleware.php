@@ -11,15 +11,34 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 use ErrorException;
 
+/**
+ * Middleware for error handling. If an exception is thrown and not catch during the request cycle,
+ * it will appear here. Middleware will catch it and return response with status code (500) and exception message
+ * as a body.
+ *
+ * @package Igni\Http\Middleware
+ */
 final class ErrorMiddleware implements MiddlewareInterface
 {
     private $errorHandler;
 
+    /**
+     * ErrorMiddleware constructor.
+     *
+     * @param callable $errorHandler
+     */
     public function __construct(callable $errorHandler)
     {
         $this->errorHandler = $errorHandler;
     }
 
+    /**
+     * @see MiddlewareInterface::process()
+     *
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $next
+     * @return ResponseInterface
+     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface
     {
         $this->setErrorHandler();

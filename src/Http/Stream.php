@@ -6,6 +6,9 @@ use Igni\Exception\InvalidArgumentException;
 use Zend\Diactoros\Stream as BaseStream;
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * @package Igni\Http
+ */
 final class Stream extends BaseStream
 {
     public static function fromString(string $content): StreamInterface

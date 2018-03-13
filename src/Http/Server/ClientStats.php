@@ -2,6 +2,11 @@
 
 namespace Igni\Http\Server;
 
+/**
+ * Value class for aggregating client statistics.
+ *
+ * @package Igni\Http\Server
+ */
 class ClientStats
 {
     private $stats;
