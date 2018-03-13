@@ -14,7 +14,10 @@ Igni aims to be:
  - Testable: Igni extends `zend-diactoros` (`PSR-7` implementation) and allows to manually dispatch routes to perform end-to-end tests.
  - Easy to use: Igni exposes an intuitive and concise API. All you need to do to use it is to include composer autoloader.
  
+### Api reference
  
+Api reference can be found [here](./docs/ApiIndex.md)
+
 ### Installation
 
 ``` 
