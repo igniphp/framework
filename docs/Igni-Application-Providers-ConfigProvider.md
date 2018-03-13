@@ -32,6 +32,6 @@ Methods
 
 
 #### Arguments
-* $config **Igni\Application\Config**
+* $config **[Igni\Application\Config](Igni-Application-Config.md)**
 
 

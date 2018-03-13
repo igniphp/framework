@@ -24,7 +24,7 @@ use Igni\Utils\ArrayUtil;
  */
 class Config
 {
-    private const PROTOTYPES = [
+    private static $prototypes = [
         'http' => [
             'class' => Http\Application::class,
             'type' => 'http',
@@ -148,7 +148,7 @@ class Config
      */
     public static function fromIni(string $path): Config
     {
-        $ini = new Ini($path, self::PROTOTYPES);
+        $ini = new Ini($path, self::$prototypes);
 
         $config = new self($ini->parse());
 
@@ -158,7 +158,7 @@ class Config
             foreach ($config->get('config.autoload') as $glob) {
                 $autoloadPath = Path::join($iniDirname, $glob);
                 foreach (glob($autoloadPath, GLOB_BRACE) as $file) {
-                    $autoloadedIni = new Ini($file, self::PROTOTYPES);
+                    $autoloadedIni = new Ini($file, self::$prototypes);
                     $config->config = array_merge_recursive($config->config, $autoloadedIni->parse());
                 }
             }

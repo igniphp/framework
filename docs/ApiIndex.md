@@ -37,6 +37,7 @@ API Index
             * [ControllerProvider](Igni-Application-Providers-ControllerProvider.md)
             * [ServiceProvider](Igni-Application-Providers-ServiceProvider.md)
             * [ConfigProvider](Igni-Application-Providers-ConfigProvider.md)
+        * [Config](Igni-Application-Config.md)
         * [ApplicationFactory](Igni-Application-ApplicationFactory.md)
         * Igni\Application\Exception
             * [ApplicationException](Igni-Application-Exception-ApplicationException.md)

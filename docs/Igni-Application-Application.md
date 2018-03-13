@@ -90,7 +90,7 @@ Application constructor.
 
 #### Arguments
 * $container **Psr\Container\ContainerInterface|null**
-* $config **Igni\Application\Config|null**
+* $config **[Igni\Application\Config](Igni-Application-Config.md)|null**
 
 
 
