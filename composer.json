@@ -31,7 +31,9 @@
     "mockery/mockery": "^0.9.4",
     "igniphp/validation": ">=1.0.0",
     "league/container": ">=1.0.0",
-    "eaglewu/swoole-ide-helper": "dev-master"
+    "eaglewu/swoole-ide-helper": "dev-master",
+    "phpdocumentor/phpdocumentor": ">=2.9",
+    "evert/phpdoc-md": "^0.2.0"
   },
   "autoload": {
     "psr-4": {

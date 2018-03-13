@@ -33,7 +33,7 @@ final class ErrorMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @see MiddlewareInterface::process()
+     * @see MiddlewareInterface::process
      *
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $next

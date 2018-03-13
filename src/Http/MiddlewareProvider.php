@@ -9,5 +9,10 @@ namespace Igni\Http;
  */
 interface MiddlewareProvider
 {
+    /**
+     * Registers new middleware in the application scope.
+     *
+     * @param MiddlewareAggregate $aggregate
+     */
     public function provideMiddleware(MiddlewareAggregate $aggregate): void;
 }
