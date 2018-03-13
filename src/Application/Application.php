@@ -100,57 +100,6 @@ abstract class Application
         return $this->config;
     }
 
-    /**
-     * Factory method, for instantiating application from ini file.
-     *
-     * @param string $path
-     * @return Application
-     */
-    public static function fromIni(string $path): Application
-    {
-        $config = Config::fromIni($path);
-
-        // Build application instance from config
-        if ($config->has('application')) {
-            $applicationClass = $config->get('application.class');
-
-            // Custom Dependecy Injection Container?
-            $container = new ServiceLocator();
-            if ($config->has('application.container')) {
-                $containerClass = $config->get('application.container');
-                if (!class_exists($containerClass)) {
-                    throw new ApplicationException("Container class ${containerClass} could not be found. Did you forget to include it in your composer.json file?");
-                }
-                $container = new $containerClass;
-            }
-
-            // Validate container
-            if (!$container instanceof ContainerInterface) {
-                throw new ApplicationException("Container ${containerClass} is not valid psr container.");
-            }
-
-            $instance = new $applicationClass($container);
-
-            // Load modules
-            if ($config->has('application.modules')) {
-                foreach ($config->get('application.modules') as $module) {
-                    $instance->extend($module);
-                }
-            }
-
-            // Load middlewares for http application
-            if ($instance instanceof Http\Application && $config->has('application.middlewares')) {
-
-            }
-
-        } else {
-            throw new ApplicationException("Cannot create application, check for existence of [application:*] or [application] section in your ini file ${path}");
-        }
-
-        return $instance;
-    }
-
-
     protected function handleOnBootListeners(): void
     {
         foreach ($this->modules as $module) {

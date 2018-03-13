@@ -21,7 +21,7 @@ Licensed under MIT License.
     + [Basic Usage](#basic-usage)
     + [Listeners](#listeners-1)
     + [Configuration](#configuration)
-  * [External webserver](#external-webserver)
+  * [Webserver configuration](#external-webserver)
     + [Apache](#apache)
     + [nginx + php-fpm](#nginx--php-fpm)
     + [PHP built-in webserver](#php-built-in-webserver)
