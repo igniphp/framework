@@ -168,6 +168,9 @@ class Server
             // Status code
             $response->status($psrResponse->getStatusCode());
 
+            // Protect server software header.
+            $response->header('software-server', '');
+
             // End.
             $response->end($psrResponse->getBody()->getContents());
         });
