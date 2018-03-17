@@ -178,7 +178,7 @@ class Response implements ResponseInterface
         $this->stream = Stream::create($body, 'wb+');
         $this->statusCode = $status;
         $this->reasonPhrase = self::$phrases[$this->statusCode];
-        list($this->headerNames, $this->headers) = $this->filterHeaders($headers);
+        $this->setHeaders($headers);
     }
 
     /**

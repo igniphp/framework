@@ -19,7 +19,7 @@ use Zend\Diactoros\Uri;
  */
 class Request implements RequestInterface
 {
-    use MessageTrait, RequestTrait;
+    use RequestTrait;
 
     public const METHOD_GET = 'GET';
     public const METHOD_HEAD = 'HEAD';
@@ -47,13 +47,11 @@ class Request implements RequestInterface
     {
         $this->validateMethod($method);
         $this->validateUri($uri);
-        $this->assertHeaders($headers);
-
+        $this->setHeaders($headers);
         $this->method = $method;
         $this->uri = $uri ? new Uri($uri) : new Uri();
         $this->stream = Stream::create($body, 'wb+');
 
-        list($this->headerNames, $this->headers) = $this->filterHeaders($headers);
         $headers['Host'] = $headers['Host'] ?? [$this->getHostFromUri()];
     }
 
