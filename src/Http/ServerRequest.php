@@ -227,7 +227,16 @@ class ServerRequest extends Request implements ServerRequestInterface
 
     public static function fromGlobals(): ServerRequest
     {
-        return self::fromPsrServerRequest(ServerRequestFactory::fromGlobals());
+        $instance = new self(
+            $_SERVER,
+            ServerRequestFactory::normalizeFiles($_FILES),
+            $_SERVER['REQUEST_URI'],
+            $_SERVER['REQUEST_METHOD'] ?? 'GET',
+            'php://input',
+            ServerRequestFactory::marshalHeaders($_SERVER)
+        );
+
+        return $instance;
     }
 
     /**
@@ -258,7 +267,7 @@ class ServerRequest extends Request implements ServerRequestInterface
 
         return new ServerRequest(
             $request->server,
-            $request->files ?? [],
+            ServerRequestFactory::normalizeFiles($request->files) ?? [],
             $uri,
             $request->server['request_method'],
             $body,
@@ -269,19 +278,5 @@ class ServerRequest extends Request implements ServerRequestInterface
     public static function fromUri($uri, $method = self::METHOD_GET, string $body = ''): ServerRequest
     {
         return new ServerRequest([], [], $uri, $method, $body);
-    }
-
-    private static function fromPsrServerRequest(ServerRequestInterface $psrRequest): ServerRequest
-    {
-        return (new ServerRequest($_SERVER, $_FILES))
-            ->withUri($psrRequest->getUri())
-            ->withMethod($psrRequest->getMethod())
-            ->withQueryParams($psrRequest->getQueryParams())
-            ->withCookieParams($psrRequest->getCookieParams())
-            ->withUploadedFiles($psrRequest->getUploadedFiles())
-            ->withBody($psrRequest->getBody())
-            ->withRequestTarget($psrRequest->getRequestTarget())
-            ->withParsedBody($psrRequest->getParsedBody())
-            ->withAttributes($psrRequest->getAttributes());
     }
 }

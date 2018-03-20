@@ -7,7 +7,7 @@ use Igni\Exception\RuntimeException;
 
 class HttpException extends RuntimeException implements HttpExceptionInterface
 {
-    public function __construct($messageBody = "", $httpStatusCode = 0, Exception $previous = null)
+    public function __construct(string $messageBody = "", int $httpStatusCode = 0, Exception $previous = null)
     {
         parent::__construct($messageBody, $httpStatusCode, $previous);
     }
