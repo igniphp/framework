@@ -1,0 +1,24 @@
+checks:
+  php:
+    code_rating: true
+
+build:
+  tests:
+    override:
+      command: "php -v"
+
+tools:
+  external_code_coverage: true
+  php_analyzer: true
+  php_changetracking: true
+  php_code_sniffer:
+    config:
+      standard: "PSR2"
+  php_mess_detector: true
+
+filter:
+  excluded_paths:
+    - docs/*
+    - examples/*
+    - tests/*
+    - src/Exception/*

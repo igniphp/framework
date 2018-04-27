@@ -11,13 +11,20 @@
          bootstrap="tests/bootstrap.php"
 >
     <testsuites>
-        <testsuite name="Igni Storage Tests">
-            <directory suffix=".php">./tests/</directory>
+        <testsuite name="All Tests">
+            <directory suffix=".php">./tests</directory>
         </testsuite>
     </testsuites>
     <filter>
-        <whitelist>
+        <whitelist processUncoveredFilesFromWhitelist="true">
             <directory>./src/</directory>
+            <exclude>
+                <directory suffix=".php">./src/Exception</directory>
+                <directory suffix=".php">./tests</directory>
+            </exclude>
         </whitelist>
     </filter>
+    <logging>
+        <log type="coverage-clover" target="./coverage.clover" charset="UTF-8" yui="true" highlight="true"/>
+    </logging>
 </phpunit>
