@@ -38,6 +38,8 @@ class RouterTest extends TestCase
 
         $router = new Router($routeParser, $dataGenerator);
         $router->addRoute($route);
+
+        self::assertInstanceOf(Router::class, $router);
     }
 
     public function testFindRoute(): void

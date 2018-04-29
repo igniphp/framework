@@ -20,6 +20,8 @@
             <directory>./src/</directory>
             <exclude>
                 <directory suffix=".php">./tests</directory>
+                <directory suffix=".php">./examples</directory>
+                <directory suffix=".php">./src/Http/Exception</directory>
             </exclude>
         </whitelist>
     </filter>
