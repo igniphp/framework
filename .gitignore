@@ -3,3 +3,4 @@
 /.idea
 /vendor
 /tests/cache/*
+/coverage.clover
