@@ -2,15 +2,16 @@
 
 namespace IgniTestFunctional\Http;
 
-use FastRoute\DataGenerator\GroupCountBased as StandardDataGenerator;
-use FastRoute\RouteParser\Std as StandardRouteParser;
 use FastRoute\DataGenerator;
+use FastRoute\DataGenerator\GroupCountBased as StandardDataGenerator;
 use FastRoute\RouteParser;
+use FastRoute\RouteParser\Std as StandardRouteParser;
 use Igni\Http\Exception\MethodNotAllowedException;
 use Igni\Http\Exception\NotFoundException;
 use Igni\Http\Route;
 use Igni\Http\Router;
-use Igni\Utils\TestCase;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase
 {
@@ -18,20 +19,20 @@ class RouterTest extends TestCase
     {
         self::assertInstanceOf(
             Router::class,
-            new Router(self::mock(RouteParser::class), self::mock(DataGenerator::class))
+            new Router(Mockery::mock(RouteParser::class), Mockery::mock(DataGenerator::class))
         );
     }
 
     public function testAddRoute(): void
     {
         $route = Route::get('/test');
-        $routeParser = self::mock(RouteParser::class);
+        $routeParser = Mockery::mock(RouteParser::class);
         $routeParser
             ->shouldReceive('parse')
             ->withArgs(['/test'])
             ->andReturn(['/test']);
 
-        $dataGenerator = self::mock(DataGenerator::class);
+        $dataGenerator = Mockery::mock(DataGenerator::class);
         $dataGenerator
             ->shouldReceive('addRoute')
             ->withArgs(['GET', '/test', $route]);

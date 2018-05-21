@@ -2,16 +2,16 @@
 
 namespace IgniTestFunctional\Http;
 
+use Igni\Application\Application as AbstractApplication;
 use Igni\Application\Listeners\OnBootListener;
 use Igni\Application\Listeners\OnRunListener;
 use Igni\Application\Listeners\OnShutDownListener;
-use Igni\Application\Application as AbstractApplication;
 use Igni\Http\Application;
 use Igni\Http\Request;
 use Igni\Http\Response;
 use Igni\Http\ServerRequest;
 use Igni\Http\Stream;
-use Igni\Utils\TestCase;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
