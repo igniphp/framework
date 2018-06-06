@@ -23,15 +23,15 @@
   },
   "require": {
     "php": ">=7.1.0",
-    "psr/http-message": ">=1.0",
-    "psr/container": ">=1.0",
-    "psr/simple-cache": ">=1.0",
-    "psr/log": ">=1.0",
     "igniphp/container": ">=1.1.0",
+    "igniphp/exception": "^1.0",
     "nikic/fast-route": "1.0",
+    "psr/container": ">=1.0",
+    "psr/http-message": ">=1.0",
+    "psr/log": ">=1.0",
+    "psr/simple-cache": ">=1.0",
     "zendframework/zend-diactoros": ">=1.7",
-    "zendframework/zend-stratigility": ">=3.0.0",
-    "igniphp/exception": "^1.0"
+    "zendframework/zend-stratigility": ">=3.0.0"
   },
   "suggest": {
     "ext-swoole": "for asynchronous support."
@@ -51,5 +51,8 @@
     "psr-4": {
       "IgniTest\\": "tests/"
     }
+  },
+  "config": {
+    "sort-packages": true
   }
 }
