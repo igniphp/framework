@@ -12,7 +12,7 @@ class HttpConfiguration
     public const DISPATCH_MODULO = 2;
     public const DISPATCH_PREEMPTIVE_ASSIGNMENT = 3;
     public const DEFAULT_ADDRESS = '0.0.0.0';
-    public const DEFAULT_PORT = 8080;
+    public const DEFAULT_PORT = 80;
 
     /**
      * @var array

@@ -128,8 +128,10 @@ class Server
      */
     public function stop(): void
     {
-        $this->handler->shutdown();
-        $this->handler = null;
+        if ($this->handler !== null) {
+            $this->handler->shutdown();
+            $this->handler = null;
+        }
     }
 
     private function attachListener(Listener $listener): void

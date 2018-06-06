@@ -13,7 +13,7 @@ use Igni\Http\Router;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class RouterTest extends TestCase
+final class RouterTest extends TestCase
 {
     public function testCanInstantiate(): void
     {

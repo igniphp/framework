@@ -62,16 +62,6 @@ class ServerStats
     }
 
     /**
-     * Returns the number of queuing up tasks
-     *
-     * @return int
-     */
-    public function getAwaitingConnections(): int
-    {
-        return $this->stats['close_count'];
-    }
-
-    /**
      * Returns the number of received requests
      *
      * @return int

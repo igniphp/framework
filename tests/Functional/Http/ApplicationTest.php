@@ -7,6 +7,7 @@ use Igni\Application\Listeners\OnBootListener;
 use Igni\Application\Listeners\OnRunListener;
 use Igni\Application\Listeners\OnShutDownListener;
 use Igni\Http\Application;
+use Igni\Http\Controller\ControllerAggregate;
 use Igni\Http\Request;
 use Igni\Http\Response;
 use Igni\Http\ServerRequest;
@@ -16,7 +17,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class ApplicationTest extends TestCase
+final class ApplicationTest extends TestCase
 {
     public function testCanInstantiate(): void
     {
@@ -122,6 +123,13 @@ class ApplicationTest extends TestCase
         self::assertSame("Test passes: OK", (string) $response->getBody());
     }
 
+    public function testGetControllerAggregate(): void
+    {
+        $application = new Application();
+
+        self::assertInstanceOf(ControllerAggregate::class, $application->getControllerAggregate());
+    }
+    
     public function getApplicationRouteMethods(): array
     {
         return  $routes = [

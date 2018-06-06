@@ -63,6 +63,7 @@ class ServerRequest extends Request implements ServerRequestInterface
         $this->validateUploadedFiles($uploadedFiles);
         $this->serverParams  = $serverParams;
         $this->uploadedFiles = $uploadedFiles;
+        parse_str($this->getUri()->getQuery(), $this->queryParams);
     }
 
     /**
@@ -230,7 +231,7 @@ class ServerRequest extends Request implements ServerRequestInterface
         $instance = new self(
             $_SERVER,
             ServerRequestFactory::normalizeFiles($_FILES),
-            $_SERVER['REQUEST_URI'],
+            $_SERVER['REQUEST_URI'] ?? '',
             $_SERVER['REQUEST_METHOD'] ?? 'GET',
             'php://input',
             ServerRequestFactory::marshalHeaders($_SERVER)
@@ -253,23 +254,30 @@ class ServerRequest extends Request implements ServerRequestInterface
 
         // Parse headers
         $headers = [];
-        foreach ($request->header as $name => $value) {
-            if (!isset($headers[$name])) {
-                $headers[$name] = [];
+        if ($request->header) {
+            foreach ($request->header as $name => $value) {
+                if (!isset($headers[$name])) {
+                    $headers[$name] = [];
+                }
+                array_push($headers[$name], $value);
             }
-            array_push($headers[$name], $value);
         }
 
-        $body = $request->rawContent();
+        try {
+            $body = $request->rawContent();
+        } catch (\Throwable $throwable) {
+            $body = '';
+        }
+
         if (!$body) {
             $body = '';
         }
 
         return new ServerRequest(
-            $request->server,
-            ServerRequestFactory::normalizeFiles($request->files) ?? [],
+            $request->server ?? [],
+            ServerRequestFactory::normalizeFiles($request->files ?? []) ?? [],
             $uri,
-            $request->server['request_method'],
+            $request->server['request_method'] ?? 'GET',
             $body,
             $headers
         );

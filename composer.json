@@ -19,7 +19,8 @@
     }
   ],
   "scripts": {
-    "phpstan": "vendor/bin/phpstan analyse src --level=0"
+    "phpstan": "vendor/bin/phpstan analyse src --level=0",
+    "coverage": "vendor/bin/phpunit --coverage-html ../coverage"
   },
   "require": {
     "igniphp/container": ">=1.1.0",

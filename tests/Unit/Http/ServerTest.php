@@ -82,7 +82,7 @@ final class ServerTest extends TestCase
                 self::assertSame(
                     [
                         'address' => '0.0.0.0',
-                        'port' => 8080,
+                        'port' => 80,
                         'ssl_cert_file' => 'a',
                         'ssl_key_file' => 'b',
                     ],
@@ -94,6 +94,16 @@ final class ServerTest extends TestCase
 
         self::assertNull($server->start());
     }
+
+    public function testStop(): void
+    {
+        $server = new Server();
+        $swoole = $this->initializeSwoole($server);
+        $swoole->shouldReceive('shutdown');
+
+        self::assertNull($server->stop());
+    }
+
 
     private function initializeSwoole(Server $server): Mockery\MockInterface
     {

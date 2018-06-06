@@ -2,7 +2,9 @@
 
 namespace IgniTestFunctional\Application;
 
+use Igni\Application\Config;
 use Igni\Application\Controller\ControllerAggregate;
+use Igni\Application\Exception\ApplicationException;
 use Igni\Application\Listeners\OnBootListener;
 use Igni\Application\Providers\ControllerProvider;
 use PHPUnit\Framework\TestCase;
@@ -34,6 +36,19 @@ final class ApplicationTest extends TestCase
         self::assertFalse($application->onRun);
         self::assertFalse($application->onShutDown);
         self::assertTrue($application->getControllerAggregate()->has('test_controller'));
+    }
+
+    public function testExtendWithInvalidModule(): void
+    {
+        $this->expectException(ApplicationException::class);
+        $application = new NullApplication();
+        $application->extend('t1');
+    }
+
+    public function testGetDefaultConfig(): void
+    {
+        $application = new NullApplication();
+        self::assertInstanceOf(Config::class, $application->getConfig());
     }
 }
 
