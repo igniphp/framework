@@ -7,7 +7,6 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         syntaxCheck="false"
          bootstrap="tests/bootstrap.php"
 >
     <testsuites>
@@ -22,10 +21,11 @@
                 <directory suffix=".php">./tests</directory>
                 <directory suffix=".php">./examples</directory>
                 <directory suffix=".php">./src/Http/Exception</directory>
+                <directory suffix=".php">./src/Application/Exception</directory>
             </exclude>
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-clover" target="./coverage.clover" charset="UTF-8" yui="true" highlight="true"/>
+        <log type="coverage-clover" target="./coverage.clover"/>
     </logging>
 </phpunit>

@@ -7,7 +7,7 @@ php:
   - 7.2
 
 before_install:
-  - printf "\n" | pecl install swoole
+  - yes Y | pecl install swoole
   - composer self-update
 
 install:
