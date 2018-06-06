@@ -36,7 +36,7 @@ class Server
     /**
      * @var Listener[]
      */
-    private $listeners;
+    private $listeners = [];
 
     public function __construct(HttpConfiguration $settings = null)
     {
@@ -48,7 +48,7 @@ class Server
             $settings = new HttpConfiguration();
         }
 
-        $this->settings= $settings;
+        $this->settings = $settings;
     }
 
     /**
@@ -101,14 +101,17 @@ class Server
      */
     public function start(): void
     {
-        // Create swoole's server instance.
         if ($this->settings->isSslEnabled()) {
             $flags = SWOOLE_SOCK_TCP | SWOOLE_SSL;
         } else {
             $flags = SWOOLE_SOCK_TCP;
         }
+
         $settings = $this->settings->getSettings();
-        $this->handler = new Swoole\Http\Server($settings['address'], $settings['port'], SWOOLE_PROCESS, $flags);
+
+        if (!defined('IS_TEST') || IS_TEST !== true) {
+            $this->handler = new Swoole\Http\Server($settings['address'], $settings['port'], SWOOLE_PROCESS, $flags);
+        }
         $this->handler->set($settings);
 
         // Attach listeners.

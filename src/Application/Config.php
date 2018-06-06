@@ -80,7 +80,7 @@ class Config
      */
     public function merge(Config $config): Config
     {
-        $this->config = array_merge_recursive($this->config, $config);
+        $this->config = array_merge_recursive($this->config, $config->config);
 
         return $this;
     }
