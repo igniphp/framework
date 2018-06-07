@@ -101,10 +101,9 @@ class Server
      */
     public function start(): void
     {
+        $flags = SWOOLE_SOCK_TCP;
         if ($this->settings->isSslEnabled()) {
-            $flags = SWOOLE_SOCK_TCP | SWOOLE_SSL;
-        } else {
-            $flags = SWOOLE_SOCK_TCP;
+            $flags |= SWOOLE_SSL;
         }
 
         $settings = $this->settings->getSettings();
