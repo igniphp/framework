@@ -53,7 +53,7 @@ Requirements:
 
 ### Routing
 
-Igni router is based on the fastest routing library (nikic/fastroute).
+Igni router is based on very fast routing library ([nikic/fastroute](https://github.com/nikic/FastRoute)).
 
 ### PSR-7, PSR-15 Support
 
