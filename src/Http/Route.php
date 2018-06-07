@@ -2,56 +2,84 @@
 
 namespace Igni\Http;
 
+use Symfony\Component\Routing\Route as BaseRoute;
+
 /**
- * Represents route pattern.
+ * Proxy class for symfony's route.
  *
  * @package Igni\Http
  */
 class Route
 {
     /**
-     * @var string
+     * @var BaseRoute
      */
-    private $expression;
+    private $baseRoute;
 
     /**
      * @var string
      */
-    private $method;
+    private $name;
 
     /**
      * @var array
      */
-    private $attributes = [];
+    private $requirements = [];
 
     /**
-     * Callable or valid class name
-     * @var callable|string
+     * @var array
      */
-    private $handler;
+    private $defaults = [];
 
     /**
      * Route constructor.
      *
-     * @param string $expression
-     * @param string $method
+     * @param string $path
+     * @param string $name
+     * @param array $methods
      */
-    public function __construct(string $expression, string $method)
+    public function __construct(string $path, array $methods = [], string $name = null)
     {
-        $this->expression = $expression;
-        $this->method = $method;
+        $this->name = $name ?? self::generateNameFromPath($path);
+        $this->baseRoute = new BaseRoute($path);
+        $this->baseRoute->setMethods($methods);
+    }
+
+    /**
+     * @param string $parameter
+     * @param string $regex
+     * @return $this
+     */
+    public function addRule(string $parameter, string $regex): self
+    {
+        $this->requirements[$parameter] = $regex;
+
+        return $this;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**
      * Sets controller that is going to handle all request
      * which uri matches the route pattern.
      *
-     * @param $handler
+     * @param string|callable $handler
      * @return $this
      */
-    public function delegate($handler)
+    public function delegate($handler): self
     {
-        $this->handler = $handler;
+        $this->defaults['-controller'] = $handler;
+
         return $this;
     }
 
@@ -60,30 +88,30 @@ class Route
      *
      * @return string
      */
-    public function getExpression(): string
+    public function getPath(): string
     {
-        return $this->expression;
+        return $this->baseRoute->getPath();
     }
 
     /**
-     * Returns request method.
+     * Returns request methods.
      *
-     * @return string
+     * @return array
      */
-    public function getMethod(): string
+    public function getMethods(): array
     {
-        return $this->method;
+        return $this->baseRoute->getMethods();
     }
 
     /**
      * Returns controller that listen to request
      * which uri matches the route pattern.
      *
-     * @return callable|string
+     * @return callable|string|null
      */
     public function getDelegator()
     {
-        return $this->handler;
+        return $this->defaults['-controller'] ?? null;
     }
 
     /**
@@ -102,96 +130,126 @@ class Route
     }
 
     /**
+     * @internal
+     * @return BaseRoute
+     */
+    public function getBaseRoute(): BaseRoute
+    {
+        $this->baseRoute->setDefaults($this->defaults);
+        $this->baseRoute->setRequirements($this->requirements);
+
+        return $this->baseRoute;
+    }
+
+    /**
      * Returns attributes extracted from the uri.
      *
      * @return array
      */
     public function getAttributes(): array
     {
-        return $this->attributes;
+        return $this->baseRoute->getOptions();
     }
 
     /**
      * Factories new instance of the route
      * that will be matched against get request.
      *
-     * @param string $expression
+     * @param string $path
+     * @param string $name
      * @return Route
      */
-    public static function get(string $expression): Route
+    public static function get(string $path, string $name = null): Route
     {
-        return new self($expression, Request::METHOD_GET);
+        return new self($path, [Request::METHOD_GET], $name ?? self::generateNameFromPath($path));
     }
 
     /**
      * Factories new instance of the route
      * that will be matched against post request.
      *
-     * @param string $expression
+     * @param string $path
+     * @param string $name
      * @return Route
      */
-    public static function post(string $expression): Route
+    public static function post(string $path, string $name = null): Route
     {
-        return new self($expression, Request::METHOD_POST);
+        return new self($path, [Request::METHOD_POST], $name ?? self::generateNameFromPath($path));
     }
 
     /**
      * Factories new instance of the route
      * that will be matched against put request.
      *
-     * @param string $expression
+     * @param string $path
+     * @param string $name
      * @return Route
      */
-    public static function put(string $expression): Route
+    public static function put(string $path, string $name = null): Route
     {
-        return new self($expression, Request::METHOD_PUT);
+        return new self($path, [Request::METHOD_PUT], $name ?? self::generateNameFromPath($path));
     }
 
     /**
      * Factories new instance of the route
      * that will be matched against delete request.
      *
-     * @param string $expression
+     * @param string $path
+     * @param string $name
      * @return Route
      */
-    public static function delete(string $expression): Route
+    public static function delete(string $path, string $name = null): Route
     {
-        return new self($expression, Request::METHOD_DELETE);
+        return new self($path, [Request::METHOD_DELETE], $name ?? self::generateNameFromPath($path));
     }
 
     /**
      * Factories new instance of the route
      * that will be matched against patch request.
      *
-     * @param string $expression
+     * @param string $path
+     * @param string $name
      * @return Route
      */
-    public static function patch(string $expression): Route
+    public static function patch(string $path, string $name = null): Route
     {
-        return new self($expression, Request::METHOD_PATCH);
+        return new self($path, [Request::METHOD_PATCH], $name ?? self::generateNameFromPath($path));
     }
 
     /**
      * Factories new instance of the route
      * that will be matched against head request.
      *
-     * @param string $expression
+     * @param string $path
+     * @param string $name
      * @return Route
      */
-    public static function head(string $expression): Route
+    public static function head(string $path, string $name = null): Route
     {
-        return new self($expression, Request::METHOD_HEAD);
+        return new self($path, [Request::METHOD_HEAD], $name ?? self::generateNameFromPath($path));
     }
 
     /**
      * Factories new instance of the route
      * that will be matched against options request.
      *
-     * @param string $expression
+     * @param string $path
+     * @param string $name
      * @return Route
      */
-    public static function options(string $expression): Route
+    public static function options(string $path, string $name = null): Route
     {
-        return new self($expression, Request::METHOD_OPTIONS);
+        return new self($path, [Request::METHOD_OPTIONS], $name ?? self::generateNameFromPath($path));
+    }
+
+    /**
+     * Generates default name from given path expression,
+     * /some/{resource} becomes some_resource
+     * @param string $path
+     * @return string
+     */
+    private static function generateNameFromPath(string $path): string
+    {
+        return str_replace(['{', '}', '/'], ['', '', '_'], trim($path, '/'));
     }
 }

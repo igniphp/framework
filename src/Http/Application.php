@@ -174,7 +174,7 @@ class Application
             return $response;
         }
 
-        throw HttpModuleException::couldNotRetrieveControllerForRoute($route->getExpression());
+        throw HttpModuleException::couldNotRetrieveControllerForRoute($route->getPath());
     }
 
     /**

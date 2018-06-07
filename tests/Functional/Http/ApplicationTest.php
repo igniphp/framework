@@ -129,7 +129,7 @@ final class ApplicationTest extends TestCase
 
         self::assertInstanceOf(ControllerAggregate::class, $application->getControllerAggregate());
     }
-    
+
     public function getApplicationRouteMethods(): array
     {
         return  $routes = [
