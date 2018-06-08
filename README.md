@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/igniphp/framework.svg?branch=master)](https://travis-ci.org/igniphp/framework)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/igniphp/framework/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/igniphp/framework/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/igniphp/framework/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/igniphp/framework/?branch=master)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 Igni is a mini php7 framework with modular architecture support that helps you quickly write scalable PSR-7 and PSR-15 compilant REST services.
 
