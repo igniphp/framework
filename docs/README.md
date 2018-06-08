@@ -6,7 +6,6 @@ Licensed under MIT License.
 ## Table of Contents
  * [Overview](#overview)
     + [Introduction](#introduction)
-    + [Api reference](#api-reference)
     + [Installation](#installation)
     + [Usage](#usage)
   * [Routing](#routing)
@@ -16,6 +15,8 @@ Licensed under MIT License.
     + [Providers](#providers)
   * [The Request](#the-request)
   * [The Response](#the-response)
+  * [Error handling](#error-handling)
+  * [Testing](#testing)
   * [Igni's server](#ignis-server)
     + [Installation](#installation-1)
     + [Basic Usage](#basic-usage)
@@ -322,6 +323,49 @@ Controller provider is used to register controllers within the application.
 Makes usage of PSR compatible DI of your choice (If none is passed to application igniphp/container 
 implementation will be used as default) to register additional services.
 
+## Controllers
+
+Igni uses invokable controllers (single action controllers). There few reasons for that:
+
+- Controller can effectively wrap simple functionality into well defined namespace
+- Less dependencies are required to perform the action 
+- Can be easy replaced with functions
+- Does not break SRP 
+- Makes testing easier
+
+In order to define controller one must implement `Igni\Http\Controller` interface.
+The following code contains an example controller which contains welcome message in the response.
+
+```php
+<?php
+// Include composer's autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Igni\Http\Route;
+
+class WelcomeUserController implements Igni\Http\Controller
+{
+    public function __invoke(ServerRequestInterface $request): ResponseInterface 
+    {
+        return \Igni\Http\Response::fromText("Hi {$request->getAttribute('name')}!");
+    }
+    
+    public static function getRoute(): Route 
+    {
+        return Route::get('hi/{name}');
+    }
+}
+```
+
+Controller can be registered either in your [module file](../examples/Modules/SimpleModule.php) 
+or simply by calling `add` method on application's controller aggregate:
+
+```php
+$application->getControllerAggregate()->add(WelcomeUserController::class);
+```
+
 ## The Request
 Igni's controllers and middleware are given a PSR-7 server request object that represents http request send 
 by the client. Request contains route's params, body, request method, request uri and so on.
@@ -353,6 +397,87 @@ Creates PSR-7 request with content type set to `text/html` and body containing p
 
 Creates PSR-7 request with content type set to `application/xml` and body containing xml string.
 `$data` can be `\SimpleXMLElement`, `\DOMDocument` or just plain string.
+
+## Error handling
+Igni provides default error handler so if anything goes wrong in your application the error will not be 
+directly propagated to the client layer. 
+`\Igni\Http\Middleware\ErrorMiddleware` is responsible for the error handling.
+
+In any case you would like to provide custom error handler, it can be done by simply creating middleware with try/catch
+statement inside `process` method. 
+The following code returns custom response in case any error occurs in the application:
+ 
+```php
+<?php
+// Include composer's autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\MiddlewareInterface;
+
+class CustomErrorHandler implements MiddlewareInterface
+{
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface 
+    {
+        try {
+            $response = $next->handle($request);
+        } catch (Throwable $throwable) {
+            $response = \Igni\Http\Response::fromText('Custom error message', $status = 500);
+        }
+        
+        return $response;
+    }
+}
+
+$application = new Igni\Http\Application();
+$application->use(new CustomErrorHandler());
+
+// Run the application.
+$application->run();
+```
+
+## Testing
+Igni is build to be testable and maintainable in fact most of the crucial framework's layers are covered
+with reasonable amount of tests.
+
+Testing your code can be simply performed by executing your controller with mocked ServerRequest object, 
+consider following example:
+```php
+<?php declare(strict_types=1);
+
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Igni\Http\Route;
+
+class WelcomeUserController implements Igni\Http\Controller
+{
+    public function __invoke(ServerRequestInterface $request): ResponseInterface 
+    {
+        return \Igni\Http\Response::fromText("Hi {$request->getAttribute('name')}!");
+    }
+    
+    public static function getRoute(): Route 
+    {
+        return Route::get('hi/{name}');
+    }
+}
+
+final class WelcomeUserControllerTest extends TestCase
+{
+    public function testWelcome(): void
+    {
+        $controller = new WelcomeUserController();
+        $response = $controller(\Igni\Http\ServerRequest::fromUri('/hi/Tom'));
+        
+        self::assertSame('Hi Tom!', (string) $response->getBody());
+        self::assertSame(200, $response->getStatusCode());
+    }
+}
+```
+
 
 ## Igni's server
 
