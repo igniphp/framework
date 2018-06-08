@@ -31,20 +31,25 @@ final class RouterTest extends TestCase
     {
         $test = Route::get('/test');
         $test1 = Route::get('/test/{id}');
-        $test2 = Route::post('/a[/b[/{c}]]');
+        $test2 = Route::post('/a/{b}/{c}');
+        $test2->setDefaults([
+            'b' => 'b',
+            'c' => 'c',
+        ]);
         $router = new Router();
         $router->addRoute($test);
         $router->addRoute($test1);
         $router->addRoute($test2);
 
-        $result = $router->findRoute('POST', '/a/b');
-
-
-        $result = $router->findRoute('POST', '/a/b/1');
-
-
+        $result = $router->findRoute('POST', '/a/1');
+        self::assertInstanceOf(Route::class, $result);
+        self::assertSame(['b' => '1', 'c' => 'c'], $result->getAttributes());
+        $result = $router->findRoute('POST', '/a/1/1');
+        self::assertInstanceOf(Route::class, $result);
+        self::assertSame(['b' => '1', 'c' => '1'], $result->getAttributes());
         $result = $router->findRoute('GET', '/test');
-
+        self::assertInstanceOf(Route::class, $result);
+        self::assertSame([], $result->getAttributes());
     }
 
     public function testNotFound(): void

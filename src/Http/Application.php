@@ -2,8 +2,6 @@
 
 namespace Igni\Http;
 
-use FastRoute\DataGenerator\GroupCountBased as StandardDataGenerator;
-use FastRoute\RouteParser\Std as StandardRouteParser;
 use Igni\Application\Application as AbstractApplication;
 use Igni\Application\Controller\ControllerAggregate as AbstractControllerAggregate;
 use Igni\Application\Exception\ApplicationException;
@@ -17,10 +15,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 use Zend\Diactoros\Response\SapiEmitter;
 use Zend\Stratigility\Middleware\CallableMiddlewareDecorator;
 use Zend\Stratigility\MiddlewarePipe;
-use Throwable;
 
 /**
  * @see \Igni\Application\Application
@@ -47,9 +45,9 @@ class Application
     private $resolver;
 
     /**
-     * @var string|MiddlewareInterface[]
+     * @var string[]|MiddlewareInterface[]
      */
-    private $middlewares = [];
+    private $middleware = [];
 
     /**
      * @var MiddlewarePipe
@@ -65,7 +63,7 @@ class Application
     {
         parent::__construct($container);
 
-        $this->router = new Router(new StandardRouteParser(), new StandardDataGenerator());
+        $this->router = new Router();
         $this->resolver = new DependencyResolver($this->serviceLocator);
         $this->controllerAggregate = new ControllerAggregate($this->router);
     }
@@ -130,7 +128,7 @@ class Application
             $middleware = new CallableMiddlewareDecorator($middleware);
         }
 
-        $this->middlewares[] = $middleware;
+        $this->middleware[] = $middleware;
     }
 
     /**
@@ -305,7 +303,7 @@ class Application
         $pipe->pipe(new ErrorMiddleware(function(Throwable $exception) {
             $this->handleOnErrorListeners($exception);
         }));
-        foreach ($this->middlewares as $middleware) {
+        foreach ($this->middleware as $middleware) {
             if (is_string($middleware)) {
                 $middleware = $this->resolver->resolve($middleware);
             }

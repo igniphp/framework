@@ -32,6 +32,11 @@ class Route
     private $defaults = [];
 
     /**
+     * @var array
+     */
+    private $attributes = [];
+
+    /**
      * Route constructor.
      *
      * @param string $path
@@ -53,6 +58,13 @@ class Route
     public function addRule(string $parameter, string $regex): self
     {
         $this->requirements[$parameter] = $regex;
+
+        return $this;
+    }
+
+    public function setDefaults(array $defaults): self
+    {
+        $this->defaults = $defaults;
 
         return $this;
     }
@@ -148,7 +160,7 @@ class Route
      */
     public function getAttributes(): array
     {
-        return $this->baseRoute->getOptions();
+        return $this->attributes;
     }
 
     /**
@@ -226,7 +238,7 @@ class Route
      */
     public static function head(string $path, string $name = null): Route
     {
-        return new self($path, [Request::METHOD_HEAD], $name ?? self::generateNameFromPath($path));
+        return new self($path, [Request::METHOD_HEAD, Request::METHOD_GET], $name ?? self::generateNameFromPath($path));
     }
 
     /**

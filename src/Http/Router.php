@@ -2,6 +2,9 @@
 
 namespace Igni\Http;
 
+use Igni\Http\Exception\NotFoundException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -16,11 +19,14 @@ class Router
     /**
      * @var RouteCollection
      */
-    private $routes;
+    private $routeCollection;
+
+    /** @var array */
+    private $routes = [];
 
     public function __construct()
     {
-        $this->routes = new RouteCollection();
+        $this->routeCollection = new RouteCollection();
     }
 
     /**
@@ -31,7 +37,8 @@ class Router
     public function addRoute(Route $route): void
     {
         $baseRoute = $route->getBaseRoute();
-        $this->routes->add($route->getName(), $baseRoute);
+        $this->routeCollection->add($route->getName(), $baseRoute);
+        $this->routes[$route->getName()] = $route;
     }
 
     /**
@@ -43,7 +50,18 @@ class Router
      */
     public function findRoute(string $method, string $path): Route
     {
-        $matcher = new UrlMatcher($this->routes, new RequestContext('/', $method));
-        $matcher->match($path);
+        $matcher = new UrlMatcher($this->routeCollection, new RequestContext('/', $method));
+        try {
+            $route = $matcher->match($path);
+        } catch (ResourceNotFoundException $exception) {
+            throw NotFoundException::notFound($path, $method);
+        } catch (MethodNotAllowedException $exception) {
+            throw \Igni\Http\Exception\MethodNotAllowedException::methodNotAllowed($path, $method, $exception->getAllowedMethods());
+        }
+
+        $routeName = $route['_route'];
+        unset($route['_route']);
+
+        return $this->routes[$routeName]->withAttributes($route);
     }
 }
