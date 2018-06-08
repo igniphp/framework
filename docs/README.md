@@ -448,6 +448,22 @@ consider following example:
 <?php declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Igni\Http\Route;
+
+class WelcomeUserController implements Igni\Http\Controller
+{
+    public function __invoke(ServerRequestInterface $request): ResponseInterface 
+    {
+        return \Igni\Http\Response::fromText("Hi {$request->getAttribute('name')}!");
+    }
+    
+    public static function getRoute(): Route 
+    {
+        return Route::get('hi/{name}');
+    }
+}
 
 final class WelcomeUserControllerTest extends TestCase
 {
