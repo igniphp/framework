@@ -24,7 +24,7 @@
   },
   "require": {
     "igniphp/container": ">=1.1.0",
-    "igniphp/exception": "^1.0",
+    "igniphp/exception": ">=1.0",
     "nikic/fast-route": "1.0",
     "php": ">=7.1.0",
     "psr/container": ">=1.0",
