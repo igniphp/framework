@@ -43,23 +43,11 @@ class Route
      * @param string $name
      * @param array $methods
      */
-    public function __construct(string $path, array $methods = [], string $name = null)
+    public function __construct(string $path, array $methods = ['GET'], string $name = null)
     {
         $this->name = $name ?? self::generateNameFromPath($path);
         $this->baseRoute = new BaseRoute($path);
         $this->baseRoute->setMethods($methods);
-    }
-
-    /**
-     * @param string $parameter
-     * @param string $regex
-     * @return $this
-     */
-    public function addRule(string $parameter, string $regex): self
-    {
-        $this->requirements[$parameter] = $regex;
-
-        return $this;
     }
 
     public function setDefaults(array $defaults): self
@@ -262,6 +250,7 @@ class Route
      */
     private static function generateNameFromPath(string $path): string
     {
-        return str_replace(['{', '}', '/'], ['', '', '_'], trim($path, '/'));
+        $path = preg_replace('/\<[^\>]+\>/', '', $path);
+        return str_replace(['{', '}', '?', '.', '/'], ['', '', '', '_', '_'], trim($path, '/'));
     }
 }
