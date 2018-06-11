@@ -31,11 +31,7 @@ final class RouterTest extends TestCase
     {
         $test = Route::get('/test');
         $test1 = Route::get('/test/{id}');
-        $test2 = Route::post('/a/{b}/{c}');
-        $test2->setDefaults([
-            'b' => 'b',
-            'c' => 'c',
-        ]);
+        $test2 = Route::post('/a/{b?b}/{c?c}');
         $router = new Router();
         $router->addRoute($test);
         $router->addRoute($test1);
@@ -70,5 +66,18 @@ final class RouterTest extends TestCase
 
         $this->expectException(MethodNotAllowedException::class);
         $router->findRoute('POST', '/test');
+    }
+
+    public function testMatchOptionals(): void
+    {
+        $test = Route::delete('/users/{name<\d+>?2}');
+        $router = new Router();
+        $router->addRoute($test);
+
+        $route = $router->findRoute('DELETE', '/users');
+        self::assertSame('2', $route->getAttribute('name'));
+
+        $route = $router->findRoute('DELETE', '/users/1');
+        self::assertSame('1', $route->getAttribute('name'));
     }
 }

@@ -5,7 +5,6 @@ namespace Igni\Http;
 use Igni\Application\Application as AbstractApplication;
 use Igni\Application\Controller\ControllerAggregate as AbstractControllerAggregate;
 use Igni\Application\Exception\ApplicationException;
-use Igni\Container\DependencyResolver;
 use Igni\Http\Controller\ControllerAggregate;
 use Igni\Http\Exception\HttpModuleException;
 use Igni\Http\Middleware\ErrorMiddleware;
@@ -40,11 +39,6 @@ class Application
     private $controllerAggregate;
 
     /**
-     * @var DependencyResolver
-     */
-    private $resolver;
-
-    /**
      * @var string[]|MiddlewareInterface[]
      */
     private $middleware = [];
@@ -63,8 +57,11 @@ class Application
     {
         parent::__construct($container);
 
-        $this->router = new Router();
-        $this->resolver = new DependencyResolver($this->serviceLocator);
+        if (!$this->getContainer()->has(Router::class)) {
+            $this->getContainer()->set(Router::class, new Router());
+        }
+
+        $this->router = $this->getContainer()->get(Router::class);
         $this->controllerAggregate = new ControllerAggregate($this->router);
     }
 
@@ -159,7 +156,7 @@ class Application
             in_array(Controller::class, class_implements($controller))
         ) {
             /** @var Controller $instance */
-            $instance = $this->dependencyResolver->resolve($controller);
+            $instance = $this->resolver->resolve($controller);
             return $instance($request);
         }
 

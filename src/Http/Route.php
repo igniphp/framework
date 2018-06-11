@@ -24,11 +24,6 @@ class Route
     /**
      * @var array
      */
-    private $requirements = [];
-
-    /**
-     * @var array
-     */
     private $defaults = [];
 
     /**
@@ -48,13 +43,6 @@ class Route
         $this->name = $name ?? self::generateNameFromPath($path);
         $this->baseRoute = new BaseRoute($path);
         $this->baseRoute->setMethods($methods);
-    }
-
-    public function setDefaults(array $defaults): self
-    {
-        $this->defaults = $defaults;
-
-        return $this;
     }
 
     public function setName(string $name): self
@@ -135,9 +123,6 @@ class Route
      */
     public function getBaseRoute(): BaseRoute
     {
-        $this->baseRoute->setDefaults($this->defaults);
-        $this->baseRoute->setRequirements($this->requirements);
-
         return $this->baseRoute;
     }
 
@@ -151,6 +136,11 @@ class Route
         return $this->attributes;
     }
 
+    public function getAttribute(string $name)
+    {
+        return $this->attributes[$name] ?? null;
+    }
+
     /**
      * Factories new instance of the route
      * that will be matched against get request.
@@ -161,7 +151,7 @@ class Route
      */
     public static function get(string $path, string $name = null): Route
     {
-        return new self($path, [Request::METHOD_GET], $name ?? self::generateNameFromPath($path));
+        return new self($path, [Request::METHOD_GET], $name);
     }
 
     /**
@@ -174,7 +164,7 @@ class Route
      */
     public static function post(string $path, string $name = null): Route
     {
-        return new self($path, [Request::METHOD_POST], $name ?? self::generateNameFromPath($path));
+        return new self($path, [Request::METHOD_POST], $name);
     }
 
     /**
@@ -187,7 +177,7 @@ class Route
      */
     public static function put(string $path, string $name = null): Route
     {
-        return new self($path, [Request::METHOD_PUT], $name ?? self::generateNameFromPath($path));
+        return new self($path, [Request::METHOD_PUT], $name);
     }
 
     /**
@@ -200,7 +190,7 @@ class Route
      */
     public static function delete(string $path, string $name = null): Route
     {
-        return new self($path, [Request::METHOD_DELETE], $name ?? self::generateNameFromPath($path));
+        return new self($path, [Request::METHOD_DELETE], $name);
     }
 
     /**
@@ -213,7 +203,7 @@ class Route
      */
     public static function patch(string $path, string $name = null): Route
     {
-        return new self($path, [Request::METHOD_PATCH], $name ?? self::generateNameFromPath($path));
+        return new self($path, [Request::METHOD_PATCH], $name);
     }
 
     /**
@@ -226,7 +216,7 @@ class Route
      */
     public static function head(string $path, string $name = null): Route
     {
-        return new self($path, [Request::METHOD_HEAD, Request::METHOD_GET], $name ?? self::generateNameFromPath($path));
+        return new self($path, [Request::METHOD_HEAD, Request::METHOD_GET], $name);
     }
 
     /**
@@ -239,7 +229,7 @@ class Route
      */
     public static function options(string $path, string $name = null): Route
     {
-        return new self($path, [Request::METHOD_OPTIONS], $name ?? self::generateNameFromPath($path));
+        return new self($path, [Request::METHOD_OPTIONS], $name);
     }
 
     /**
@@ -250,7 +240,7 @@ class Route
      */
     private static function generateNameFromPath(string $path): string
     {
-        $path = preg_replace('/\<[^\>]+\>/', '', $path);
+        $path = preg_replace('/<[^>]+>/', '', $path);
         return str_replace(['{', '}', '?', '.', '/'], ['', '', '', '_', '_'], trim($path, '/'));
     }
 }

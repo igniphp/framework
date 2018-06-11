@@ -2,8 +2,9 @@
 
 namespace Igni\Http;
 
+use Igni\Http\Exception\MethodNotAllowedException;
 use Igni\Http\Exception\NotFoundException;
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException as SymfonyMethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -55,8 +56,8 @@ class Router
             $route = $matcher->match($path);
         } catch (ResourceNotFoundException $exception) {
             throw NotFoundException::notFound($path, $method);
-        } catch (MethodNotAllowedException $exception) {
-            throw \Igni\Http\Exception\MethodNotAllowedException::methodNotAllowed($path, $method, $exception->getAllowedMethods());
+        } catch (SymfonyMethodNotAllowedException $exception) {
+            throw MethodNotAllowedException::methodNotAllowed($path, $method, $exception->getAllowedMethods());
         }
 
         $routeName = $route['_route'];
