@@ -28,7 +28,7 @@ class NullApplication extends Application
         if (null !== $aggregate) {
             return $aggregate;
         }
-        $locator = $this->serviceLocator;
+        $locator = $this->getContainer();
 
         return $aggregate = new class($locator) implements ControllerAggregate {
 

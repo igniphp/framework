@@ -4,7 +4,7 @@ namespace Igni\Http\Exception;
 
 class MethodNotAllowedException extends HttpException
 {
-    public static function methodNotAllowed($uri, $method, $allowedMethods)
+    public static function methodNotAllowed(string $uri, string $method, array $allowedMethods)
     {
         $allowedMethods = implode(', ', $allowedMethods);
         $exception = new self(

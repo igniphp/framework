@@ -95,35 +95,53 @@ While using default settings it listens on incoming localhost connections at por
 
 ## Routing
 
-In Igni you define a route and the controller that is called when that route is matched against server request.
-
-The controller can be any callable or class that implements `\Igni\Http\Controller` interface. 
-The return value of callable must implements `\Psr\Http\Message\ResponseInterface`.
-
 The route is a pattern representation of expected URI requested by clients.
 Route pattern can use a syntax where `{var}` specifies a placeholder with name `var` and
 it matches a regex `[^/]+.`. 
 
-You can specify a custom pattern by writing `{name:pattern}`. Here are some examples:  
+```php
+<?php
+$application->get('/users/{id}', function() {...});
+$application->get('/books/{isbn}/page/{page}', function() {...});
+```
+
+### Custom pattern
+
+You can specify a custom pattern after the parameter name, the pattern should be enclosed between `<` and `>`.
+Here are some examples:  
 
 ```php
 <?php
 
-// Matches following get requests: users/42, users/1, but not /users/me 
-$application->get('/users/{id:\d+}', $controller);
+// Matches following get requests: /users/42, /users/1, but not /users/me 
+$application->get('/users/{id<\d+>}', function() {...});
 
-// Matches following get requests: /users/42, /users/me but not /users/me/bar
-$application->get('/users/{name}', $controller);
-
-// Matches following get requests: /users/42, /users/me, /users/me/bar as well
-$application->get('/users/{name:.+}', $controller);
-
+// Matches following get requests: /users/42, /users/me
+$application->get('/users/{name<\w+>}', function() {...});
 ```
 
-Custom patterns cannot use capturing groups, for example `/{lang:(en|de)}` is not a valid placeholder instead you can
-use `/{lang:en|de}` ([source](https://github.com/nikic/FastRoute/README.md)).
+### Default value
 
-To create optional route parts, the optional part has to be enclosed in `[...]`.
+Default value can be specified after parameter name and should follow `?` sign, example:
+```php
+<?php
+
+// Matches following get requests with default id(2): /users/42, /users 
+$application->get('/users/{id<\d+>?2}', function() {...});
+
+// Matches following get requests with default id(me): /users/42, /users/me
+$application->get('/users/{name<\w+>?me}', function() {...});
+```
+
+### Optional parameter
+
+In order to make parameter optional just add `?` add the end of the name
+```php
+<?php
+
+// Matches following get requests: /users/42, /users 
+$application->get('/users/{id?2}', function() {...});
+```
 
 ```php
 <?php

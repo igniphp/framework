@@ -120,7 +120,7 @@ final class ApplicationTest extends TestCase
         $response = $application->handle(ServerRequest::fromUri('/test/OK', $requestMethod));
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
-        self::assertSame("Test passes: OK", (string) $response->getBody());
+        self::assertSame('Test passes: OK', (string) $response->getBody());
     }
 
     public function testGetControllerAggregate(): void
@@ -129,10 +129,10 @@ final class ApplicationTest extends TestCase
 
         self::assertInstanceOf(ControllerAggregate::class, $application->getControllerAggregate());
     }
-    
+
     public function getApplicationRouteMethods(): array
     {
-        return  $routes = [
+        return [
             ['post', Request::METHOD_POST],
             ['get', Request::METHOD_GET],
             ['delete', Request::METHOD_DELETE],

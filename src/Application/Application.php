@@ -13,7 +13,6 @@ use Igni\Application\Providers\ControllerProvider;
 use Igni\Application\Providers\ServiceProvider;
 use Igni\Container\DependencyResolver;
 use Igni\Container\ServiceLocator;
-use Igni\Http;
 use Psr\Container\ContainerInterface;
 use Throwable;
 
@@ -27,12 +26,12 @@ abstract class Application
     /**
      * @var ServiceLocator|ContainerInterface
      */
-    protected $serviceLocator;
+    private $container;
 
     /**
      * @var Config
      */
-    protected $config;
+    private $config;
 
     /**
      * @var bool
@@ -47,7 +46,7 @@ abstract class Application
     /**
      * @var DependencyResolver
      */
-    protected $dependencyResolver;
+    protected $resolver;
 
     /**
      * Application constructor.
@@ -55,12 +54,15 @@ abstract class Application
      * @param ContainerInterface|null $container
      * @param Config|null $config
      */
-    public function __construct(ContainerInterface $container = null, Config $config = null)
+    public function __construct(ContainerInterface $container = null)
     {
-        $this->serviceLocator = $container ?? new ServiceLocator();
-        $this->config = $config ?? new Config([]);
+        $this->container = new Container($container);
+        $this->resolver = new DependencyResolver($this->container);
 
-        $this->dependencyResolver = new DependencyResolver($this->serviceLocator);
+        if (!$this->container->has(Config::class)) {
+            $this->container->set(Config::class, new Config([]));
+        }
+        $this->config = $this->container->get(Config::class);
         $this->modules = [];
     }
 
@@ -98,6 +100,11 @@ abstract class Application
     public function getConfig(): Config
     {
         return $this->config;
+    }
+
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 
     protected function handleOnBootListeners(): void
@@ -152,11 +159,11 @@ abstract class Application
     protected function initializeModule(&$module): void
     {
         if (is_string($module)) {
-            $module = $this->dependencyResolver->resolve($module);
+            $module = $this->resolver->resolve($module);
         }
 
         if ($module instanceof ConfigProvider) {
-            $module->provideConfig($this->config);
+            $module->provideConfig($this->getConfig());
         }
 
         if ($module instanceof ControllerProvider) {
@@ -164,7 +171,7 @@ abstract class Application
         }
 
         if ($module instanceof ServiceProvider) {
-            $module->provideServices($this->serviceLocator);
+            $module->provideServices($this->getContainer());
         }
     }
 }

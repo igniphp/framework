@@ -2,13 +2,13 @@
 
 namespace Igni\Http;
 
-use FastRoute\DataGenerator;
-use FastRoute\Dispatcher;
-use FastRoute\Dispatcher\GroupCountBased;
-use FastRoute\RouteParser;
 use Igni\Http\Exception\MethodNotAllowedException;
 use Igni\Http\Exception\NotFoundException;
-use Igni\Http\Exception\RouterException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException as SymfonyMethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Utility class for simplifying api for nikic router.
@@ -18,24 +18,16 @@ use Igni\Http\Exception\RouterException;
 class Router
 {
     /**
-     * @var RouteParser
+     * @var RouteCollection
      */
-    private $routeParser;
+    private $routeCollection;
 
-    /**
-     * @var DataGenerator
-     */
-    private $dataGenerator;
+    /** @var array */
+    private $routes = [];
 
-    /**
-     * Router constructor.
-     * @param RouteParser $routeParser
-     * @param DataGenerator $dataGenerator
-     */
-    public function __construct(RouteParser $routeParser, DataGenerator $dataGenerator)
+    public function __construct()
     {
-        $this->routeParser = $routeParser;
-        $this->dataGenerator = $dataGenerator;
+        $this->routeCollection = new RouteCollection();
     }
 
     /**
@@ -45,44 +37,32 @@ class Router
      */
     public function addRoute(Route $route): void
     {
-        if (!$route instanceof Route) {
-            throw RouterException::invalidRoute($route);
-        }
-        $routeDatas = $this->routeParser->parse($route->getExpression());
-        foreach ((array) $route->getMethod() as $method) {
-            foreach ($routeDatas as $routeData) {
-                $this->dataGenerator->addRoute($method, $routeData, $route);
-            }
-        }
+        $baseRoute = $route->getBaseRoute();
+        $this->routeCollection->add($route->getName(), $baseRoute);
+        $this->routes[$route->getName()] = $route;
     }
 
     /**
      * Finds route matching clients request.
      *
      * @param string $method request method.
-     * @param string $uri request uri.
+     * @param string $path request path.
      * @return Route
      */
-    public function findRoute(string $method, string $uri): Route
+    public function findRoute(string $method, string $path): Route
     {
-        $dispatcher = new GroupCountBased($this->getData());
-        $info = $dispatcher->dispatch($method, $uri);
-
-        switch ($info[0]) {
-            case Dispatcher::NOT_FOUND:
-                throw NotFoundException::notFound($uri, $method);
-
-            case Dispatcher::METHOD_NOT_ALLOWED:
-                $allowedMethods = $info[1];
-                throw MethodNotAllowedException::methodNotAllowed($uri, $method, $allowedMethods);
-
-            case Dispatcher::FOUND:
-                return $info[1]->withAttributes($info[2]);
+        $matcher = new UrlMatcher($this->routeCollection, new RequestContext('/', $method));
+        try {
+            $route = $matcher->match($path);
+        } catch (ResourceNotFoundException $exception) {
+            throw NotFoundException::notFound($path, $method);
+        } catch (SymfonyMethodNotAllowedException $exception) {
+            throw MethodNotAllowedException::methodNotAllowed($path, $method, $exception->getAllowedMethods());
         }
-    }
 
-    protected function getData()
-    {
-        return $this->dataGenerator->getData();
+        $routeName = $route['_route'];
+        unset($route['_route']);
+
+        return $this->routes[$routeName]->withAttributes($route);
     }
 }

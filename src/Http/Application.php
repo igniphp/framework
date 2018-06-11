@@ -2,12 +2,9 @@
 
 namespace Igni\Http;
 
-use FastRoute\DataGenerator\GroupCountBased as StandardDataGenerator;
-use FastRoute\RouteParser\Std as StandardRouteParser;
 use Igni\Application\Application as AbstractApplication;
 use Igni\Application\Controller\ControllerAggregate as AbstractControllerAggregate;
 use Igni\Application\Exception\ApplicationException;
-use Igni\Container\DependencyResolver;
 use Igni\Http\Controller\ControllerAggregate;
 use Igni\Http\Exception\HttpModuleException;
 use Igni\Http\Middleware\ErrorMiddleware;
@@ -17,10 +14,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 use Zend\Diactoros\Response\SapiEmitter;
 use Zend\Stratigility\Middleware\CallableMiddlewareDecorator;
 use Zend\Stratigility\MiddlewarePipe;
-use Throwable;
 
 /**
  * @see \Igni\Application\Application
@@ -42,14 +39,9 @@ class Application
     private $controllerAggregate;
 
     /**
-     * @var DependencyResolver
+     * @var string[]|MiddlewareInterface[]
      */
-    private $resolver;
-
-    /**
-     * @var string|MiddlewareInterface[]
-     */
-    private $middlewares = [];
+    private $middleware = [];
 
     /**
      * @var MiddlewarePipe
@@ -65,8 +57,11 @@ class Application
     {
         parent::__construct($container);
 
-        $this->router = new Router(new StandardRouteParser(), new StandardDataGenerator());
-        $this->resolver = new DependencyResolver($this->serviceLocator);
+        if (!$this->getContainer()->has(Router::class)) {
+            $this->getContainer()->set(Router::class, new Router());
+        }
+
+        $this->router = $this->getContainer()->get(Router::class);
         $this->controllerAggregate = new ControllerAggregate($this->router);
     }
 
@@ -130,7 +125,7 @@ class Application
             $middleware = new CallableMiddlewareDecorator($middleware);
         }
 
-        $this->middlewares[] = $middleware;
+        $this->middleware[] = $middleware;
     }
 
     /**
@@ -161,7 +156,7 @@ class Application
             in_array(Controller::class, class_implements($controller))
         ) {
             /** @var Controller $instance */
-            $instance = $this->dependencyResolver->resolve($controller);
+            $instance = $this->resolver->resolve($controller);
             return $instance($request);
         }
 
@@ -174,7 +169,7 @@ class Application
             return $response;
         }
 
-        throw HttpModuleException::couldNotRetrieveControllerForRoute($route->getExpression());
+        throw HttpModuleException::couldNotRetrieveControllerForRoute($route->getPath());
     }
 
     /**
@@ -305,7 +300,7 @@ class Application
         $pipe->pipe(new ErrorMiddleware(function(Throwable $exception) {
             $this->handleOnErrorListeners($exception);
         }));
-        foreach ($this->middlewares as $middleware) {
+        foreach ($this->middleware as $middleware) {
             if (is_string($middleware)) {
                 $middleware = $this->resolver->resolve($middleware);
             }

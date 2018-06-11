@@ -40,9 +40,8 @@ class ControllerAggregateTest extends TestCase
 
         $router = Mockery::mock(Router::class);
         $router->shouldReceive('addRoute')
-            ->withArgs(function($route) {
-                self::assertInstanceOf(Route::class, $route);
-                self::assertSame(HttpController::URI, $route->getExpression());
+            ->withArgs(function(Route $route) {
+                self::assertSame(HttpController::URI, $route->getPath());
                 return true;
             });
         $aggregate = new ControllerAggregate($router);
@@ -56,9 +55,9 @@ class ControllerAggregateTest extends TestCase
 
         $router = Mockery::mock(Router::class);
         $router->shouldReceive('addRoute')
-            ->withArgs(function($route) {
+            ->withArgs(function(Route $route) {
                 self::assertInstanceOf(Route::class, $route);
-                self::assertSame(HttpController::URI, $route->getExpression());
+                self::assertSame(HttpController::URI, $route->getPath());
                 return true;
             });
         $aggregate = new ControllerAggregate($router);
