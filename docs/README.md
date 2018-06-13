@@ -37,10 +37,6 @@ Igni aims to be:
  - Extensible: Igni offers extension system that allows to use `PSR-15` middleware (with `zend-stratigility`) and modular architecture.
  - Testable: Igni extends `zend-diactoros` (`PSR-7` implementation) and allows to manually dispatch routes to perform end-to-end tests.
  - Easy to use: Igni exposes an intuitive and concise API. All you need to do to use it is to include composer autoloader.
- 
-### Api reference
- 
-Api reference can be found [here](ApiIndex.md)
 
 ### Installation
 
@@ -140,17 +136,9 @@ In order to make parameter optional just add `?` add the end of the name
 <?php
 
 // Matches following get requests: /users/42, /users 
-$application->get('/users/{id?2}', function() {...});
+$application->get('/users/{id?}', function() {...});
 ```
 
-```php
-<?php
-
-// Matches: /users, /users/bob, /users/bob/details
-$application->get('/users/[{name}[/details]]', $controller);
-```
-
- > Please note: Optional parts are only supported in a trailing position.
     
 Full example:
 ```php
