@@ -56,7 +56,7 @@ class Server
      *
      * @return HttpConfiguration
      */
-    public function getSettings()
+    public function getSettings(): HttpConfiguration
     {
         return $this->settings;
     }
