@@ -228,9 +228,9 @@ class BenchmarkMiddleware implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface 
     {
-        $time = microtime();
+        $time = microtime(true);
         $response = $next->handle($request);
-        $renderTime = microtime() - $time;
+        $renderTime = microtime(true) - $time;
         
         return $response->withHeader('render-time', $renderTime);
     }
