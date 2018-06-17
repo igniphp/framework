@@ -1,10 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace IgniTestFunctional\Http;
+namespace IgniTest\Functional\Http;
 
 use Igni\Http\Server;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
+use Swoole;
+use Zend\Diactoros\Stream;
 
 final class ServerTest extends TestCase
 {
@@ -104,6 +107,53 @@ final class ServerTest extends TestCase
         self::assertNull($server->stop());
     }
 
+    public function testGzipSupport(): void
+    {
+        $settings = new Server\HttpConfiguration();
+        $server = new Server($settings);
+        
+        $content = Mockery::mock(Stream::class);
+        $content
+            ->shouldReceive('getContents')
+            ->andReturn('test body string');
+
+        $psrResponse = Mockery::mock(ResponseInterface::class);
+        $psrResponse
+            ->shouldReceive('getHeaders')
+            ->andReturn([]);
+        $psrResponse
+            ->shouldReceive('getBody')
+            ->andReturn($content);
+        $psrResponse
+            ->shouldReceive('getStatusCode')
+            ->andReturn(200);
+
+        $listener = Mockery::mock(Server\OnRequest::class);
+        $listener
+            ->shouldReceive('onRequest')
+            ->andReturn($psrResponse);
+
+        $request = Mockery::mock(Swoole\Http\Request::class);
+        $request->header = ['accept-encoding' => 'gzip, deflate'];
+
+        $response = Mockery::mock(Swoole\Http\Response::class);
+        $response
+            ->shouldReceive('status')
+            ->withArgs([200]);
+        $response
+            ->shouldReceive('header');
+        $response
+            ->shouldReceive('end');
+        $response
+            ->shouldReceive('gzip')
+            ->withArgs([1]);
+
+        $callNormalizeOnRequestListener = function($request, $response, $listener) {
+            $this->normalizeOnRequestListener($request, $response, $listener);
+        };
+
+        self::assertEmpty($callNormalizeOnRequestListener->call($server, $request, $response, $listener));
+    }
 
     private function initializeSwoole(Server $server): Mockery\MockInterface
     {
