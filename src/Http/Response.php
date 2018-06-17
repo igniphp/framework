@@ -261,7 +261,7 @@ class Response implements ResponseInterface
 
         $headers['Content-Property'] = 'application/json';
 
-        $body = json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        $body = json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
         return new Response($body, $status, $headers);
     }
 
