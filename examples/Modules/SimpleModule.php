@@ -5,7 +5,7 @@ use Examples\Controllers\GoodbyeController;
 use Igni\Application\Controller\ControllerAggregate;
 use Igni\Application\Providers\ControllerProvider;
 use Igni\Http\Response;
-use Igni\Http\Route;
+use Igni\Http\Router\Route;
 
 /**
  * Module definition.

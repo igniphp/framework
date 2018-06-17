@@ -3,8 +3,8 @@
 namespace Igni\Http\Exception;
 
 use Igni\Exception\RuntimeException;
-use Igni\Http\Route;
-use Igni\Http\Router;
+use Igni\Http\Router\Route;
+use Igni\Http\Router\Router;
 
 class RouterException extends RuntimeException implements HttpExceptionInterface
 {

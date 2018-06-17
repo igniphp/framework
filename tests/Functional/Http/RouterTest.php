@@ -4,8 +4,8 @@ namespace IgniTestFunctional\Http;
 
 use Igni\Http\Exception\MethodNotAllowedException;
 use Igni\Http\Exception\NotFoundException;
-use Igni\Http\Route;
-use Igni\Http\Router;
+use Igni\Http\Router\Route;
+use Igni\Http\Router\Router;
 use PHPUnit\Framework\TestCase;
 
 final class RouterTest extends TestCase

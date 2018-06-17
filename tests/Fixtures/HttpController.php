@@ -4,7 +4,7 @@ namespace IgniTest\Fixtures;
 
 use Igni\Http\Controller;
 use Igni\Http\Response;
-use Igni\Http\Route;
+use Igni\Http\Router\Route;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
