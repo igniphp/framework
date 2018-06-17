@@ -20,10 +20,10 @@ class Router
     /**
      * @var RouteCollection
      */
-    private $routeCollection;
+    protected $routeCollection;
 
     /** @var array */
-    private $routes = [];
+    protected $routes = [];
 
     public function __construct()
     {

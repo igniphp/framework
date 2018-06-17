@@ -52,6 +52,16 @@ class Server
     }
 
     /**
+     * Return server configuration.
+     *
+     * @return HttpConfiguration
+     */
+    public function getSettings(): HttpConfiguration
+    {
+        return $this->settings;
+    }
+
+    /**
      * Adds listener that is attached to server once it is run.
      *
      * @param Listener $listener
