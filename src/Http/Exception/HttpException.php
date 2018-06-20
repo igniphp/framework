@@ -4,6 +4,6 @@ namespace Igni\Http\Exception;
 
 interface HttpException
 {
-    public function getHttpStatusCode();
-    public function getHttpBody();
+    public function getHttpStatusCode(): int;
+    public function getHttpBody(): string;
 }

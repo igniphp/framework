@@ -2,7 +2,7 @@
 
 namespace IgniTest\Funcational\Http\Middleware;
 
-use Igni\Http\Exception\NotFoundException;
+use Igni\Http\Exception\GenericHttpException;
 use Igni\Http\Middleware\NotFoundMiddleware;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +23,7 @@ class NotFoundMiddlewareTest extends TestCase
         $requestHandler = Mockery::mock(RequestHandlerInterface::class);
         $requestHandler
             ->shouldReceive('handle')
-            ->andThrow(NotFoundException::class);
+            ->andThrow(GenericHttpException::class);
 
         $response = $middleware->process(Mockery::mock(ServerRequestInterface::class), $requestHandler);
 

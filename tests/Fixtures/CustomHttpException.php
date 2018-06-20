@@ -13,12 +13,12 @@ class CustomHttpException extends RuntimeException implements HttpException
         parent::__construct($message, $code, $previous);
     }
 
-    public function getHttpStatusCode()
+    public function getHttpStatusCode(): int
     {
         return $this->getCode();
     }
 
-    public function getHttpBody()
+    public function getHttpBody(): string
     {
         return json_encode([
             'error_code' => $this->getCode(),
