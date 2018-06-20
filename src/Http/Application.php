@@ -15,6 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
+use Zend\Diactoros\Response\EmitterInterface;
 use Zend\Diactoros\Response\SapiEmitter;
 use Zend\Stratigility\Middleware\CallableMiddlewareDecorator;
 use Zend\Stratigility\MiddlewarePipe;
@@ -49,6 +50,11 @@ class Application
     private $pipeline;
 
     /**
+     * @var EmitterInterface
+     */
+    private $emitter;
+
+    /**
      * Application constructor.
      *
      * @param ContainerInterface|null $container
@@ -57,12 +63,23 @@ class Application
     {
         parent::__construct($container);
 
-        if (!$this->getContainer()->has(Router::class)) {
-            $this->getContainer()->set(Router::class, new Router());
+        if ($this->getContainer()->has(Router::class)) {
+            $this->router = $this->getContainer()->get(Router::class);
+        } else {
+            $this->router = new Router();
         }
 
-        $this->router = $this->getContainer()->get(Router::class);
-        $this->controllerAggregate = new ControllerAggregate($this->router);
+        if ($this->getContainer()->has(ControllerAggregate::class)) {
+            $this->controllerAggregate = $this->getContainer()->get(ControllerAggregate::class);
+        } else {
+            $this->controllerAggregate = new ControllerAggregate($this->router);
+        }
+
+        if ($this->getContainer()->has(EmitterInterface::class)) {
+            $this->emitter = $this->getContainer()->get(EmitterInterface::class);
+        } else {
+            $this->emitter = new SapiEmitter();
+        }
     }
 
     /**
@@ -70,8 +87,9 @@ class Application
      */
     public function startup(): void
     {
-        $this->initialize();
         $this->handleOnBootListeners();
+        $this->initialize();
+        $this->handleOnRunListeners();
     }
 
     /**
@@ -92,14 +110,12 @@ class Application
     public function run(Server $server = null): void
     {
         $this->startup();
-
         if ($server) {
             $server->addListener($this);
             $server->start();
         } else {
             $response = $this->handle(ServerRequest::fromGlobals());
-            $emitter = new SapiEmitter();
-            $emitter->emit($response);
+            $this->emitter->emit($response);
             if ($response instanceof Response) {
                 $response->end();
             }
@@ -180,7 +196,6 @@ class Application
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $this->handleOnRunListeners();
         $response = $this->getMiddlewarePipe()->handle($request);
         return $response;
     }
