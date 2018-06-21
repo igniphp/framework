@@ -2,8 +2,8 @@
 
 namespace IgniTestFunctional\Http;
 
-use Igni\Http\Exception\MethodNotAllowedException;
-use Igni\Http\Exception\NotFoundException;
+use Igni\Http\Exception\GenericHttpException;
+use Igni\Http\Route;
 use Igni\Http\Router\Route;
 use Igni\Http\Router\Router;
 use PHPUnit\Framework\TestCase;
@@ -54,7 +54,7 @@ final class RouterTest extends TestCase
         $router = new Router();
         $router->addRoute($test);
 
-        $this->expectException(NotFoundException::class);
+        $this->expectException(GenericHttpException::class);
         $router->findRoute('GET', '/a/b');
     }
 
@@ -64,7 +64,7 @@ final class RouterTest extends TestCase
         $router = new Router();
         $router->addRoute($test);
 
-        $this->expectException(MethodNotAllowedException::class);
+        $this->expectException(GenericHttpException::class);
         $router->findRoute('POST', '/test');
     }
 

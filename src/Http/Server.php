@@ -168,25 +168,8 @@ class Server
 
     private function attachOnRequestListener(OnRequest $listener): void
     {
-        $this->handler->on('Request', function(Swoole\Http\Request $request, Swoole\Http\Response $response) use ($listener) {
-            $psrRequest = ServerRequest::fromSwooleRequest($request);
-            $psrResponse = $listener->onRequest($psrRequest);
-
-            // Set headers
-            foreach ($psrResponse->getHeaders() as $name => $values) {
-                foreach ($values as $value) {
-                    $response->header($name, $value);
-                }
-            }
-
-            // Status code
-            $response->status($psrResponse->getStatusCode());
-
-            // Protect server software header.
-            $response->header('software-server', '');
-
-            // End.
-            $response->end($psrResponse->getBody()->getContents());
+        $this->handler->on('Request', function($request, $response) use ($listener) {
+            $this->normalizeOnRequestListener($request, $response, $listener);
         });
     }
 
@@ -216,5 +199,45 @@ class Server
         $this->handler->on('Start', function() use ($listener) {
             $listener->onStart($this);
         });
+    }
+
+    private function normalizeOnRequestListener(
+        Swoole\Http\Request $request,
+        Swoole\Http\Response $response,
+        OnRequest $listener
+    ): void {
+        $psrRequest = ServerRequest::fromSwooleRequest($request);
+        $psrResponse = $listener->onRequest($psrRequest);
+
+        // Set headers
+        foreach ($psrResponse->getHeaders() as $name => $values) {
+            foreach ($values as $value) {
+                $response->header($name, $value);
+            }
+        }
+
+        // Response body.
+        $body = $psrResponse->getBody()->getContents();
+
+        // Status code
+        $response->status($psrResponse->getStatusCode());
+
+        // Protect server software header.
+        $response->header('software-server', '');
+        $response->header('server', '');
+
+        // Support gzip/deflate encoding.
+        if ($psrRequest->hasHeader('accept-encoding')) {
+            $encoding = explode(',', strtolower(implode(',', $psrRequest->getHeader('accept-encoding'))));
+
+            if (in_array('gzip', $encoding, true)) {
+                $response->gzip(1);
+            } elseif (in_array('deflate', $encoding, true)) {
+                $response->header('content-encoding', 'deflate');
+                $body = gzdeflate($body);
+            }
+        }
+
+        $response->end($body);
     }
 }

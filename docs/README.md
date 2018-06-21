@@ -17,6 +17,7 @@ Licensed under MIT License.
   * [The Response](#the-response)
   * [Error handling](#error-handling)
   * [Testing](#testing)
+  * [Working with containers](#working-with-containers)
   * [Igni's server](#ignis-server)
     + [Installation](#installation-1)
     + [Basic Usage](#basic-usage)
@@ -405,9 +406,53 @@ Creates PSR-7 request with content type set to `application/xml` and body contai
 `$data` can be `\SimpleXMLElement`, `\DOMDocument` or just plain string.
 
 ## Error handling
-Igni provides default error handler so if anything goes wrong in your application the error will not be 
-directly propagated to the client layer. 
-`\Igni\Http\Middleware\ErrorMiddleware` is responsible for the error handling.
+Igni provides default error handler (`\Igni\Http\Middleware\ErrorMiddleware`) so if anything goes 
+wrong in your application the error will not be directly propagated to the client layer unless it
+is a fatal error (fatals cannot be catched nor handled).
+
+If you intend to propagate custom error for your clients, you have two options:
+- Custom exception classes implementing `\Igni\Http\Exception\HttpException`
+- Provide custom error handling middleware
+
+
+### Custom Exceptions 
+All exceptions that implement `\Igni\Http\Exception\HttpException` are catch by default error handler and used
+to generate response for your clients:
+
+```php
+<?php
+// Include composer's autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+use Igni\Http\Exception\HttpException;
+
+class NotFoundException extends \RuntimeException implements HttpException
+{
+    public function getHttpStatusCode() 
+    {
+        return 404;
+    }
+    
+    public function getHttpBody() 
+    {
+        return json_encode([
+            'error_message' => $this->getMessage(),    
+        ]);
+    }
+    
+}
+
+$application = new Igni\Http\Application();
+$application->get('/article/{id}', function() {
+    throw new NotFoundException('Article with given id does not exists');
+});
+
+// Run the application.
+$application->run();
+```
+ 
+
+### Custom error handling middleware
 
 In any case you would like to provide custom error handler, it can be done by simply creating middleware with try/catch
 statement inside `process` method. 
@@ -482,6 +527,65 @@ final class WelcomeUserControllerTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
     }
 }
+```
+
+
+## Working with containers
+
+### Using default container
+By default Igni is using its own [dependency injection container](https://github.com/igniphp/container), which provides:
+
+- easy to use interface
+- autowiring support
+- contextual injection
+- free of any configuration or complex building process
+- small footprint
+
+So if you are fan of small and easy-to-use solutions there are no steps required in order to use it
+within your application.
+
+### Using custom container
+Igni can work with any dependency injection container that is PSR-11 compatible service. 
+In order to use your favourite DI library just pass it as parameter to application's constructor.
+If you container requires building process and you would like to use `ServiceProvider` interface,
+it is recommended to provide services as you would do this usually with your modules and attach `OnRunListener` 
+to any of your modules and build your container in the provided method:
+
+```php
+<?php
+// Include composer's autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+use Igni\Application\Application;
+use Igni\Application\Providers\ServiceProvider;
+use Igni\Application\Listeners\OnRunListener;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+class SymfonyDependencyInjectionModule implements ServiceProvider, OnRunListener
+{
+    public function onRun(Application $application) 
+    {
+        /** @var ContainerBuilder $container */
+        $container = $application->getContainer();
+        $container->compile();
+    }
+    
+    /**
+    * @param ContainerBuilder $container
+    */
+    public function provideServices(ContainerInterface $container): void 
+    {
+        $container->register('mailer', 'Mailer');
+    }
+}
+
+$containerBuilder = new ContainerBuilder();
+$application = new Igni\Http\Application($containerBuilder);
+$application->use(new SymfonyDependencyInjectionModule());
+
+// Run the application.
+$application->run();
 ```
 
 

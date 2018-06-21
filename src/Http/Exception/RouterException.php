@@ -6,7 +6,7 @@ use Igni\Exception\RuntimeException;
 use Igni\Http\Router\Route;
 use Igni\Http\Router\Router;
 
-class RouterException extends RuntimeException implements HttpExceptionInterface
+class RouterException extends RuntimeException implements HttpException
 {
     private $httpStatus;
 

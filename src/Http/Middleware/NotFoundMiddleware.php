@@ -2,7 +2,7 @@
 
 namespace Igni\Http\Middleware;
 
-use Igni\Http\Exception\NotFoundException;
+use Igni\Http\Exception\GenericHttpException;
 use Igni\Http\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,7 +27,7 @@ final class NotFoundMiddleware implements MiddlewareInterface
     {
         try {
             $response = $next->handle($request);
-        } catch (NotFoundException $exception) {
+        } catch (GenericHttpException $exception) {
             $response = Response::fromText('Not Found', Response::HTTP_NOT_FOUND);
         }
 
