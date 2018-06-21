@@ -52,17 +52,22 @@ abstract class Application
      * Application constructor.
      *
      * @param ContainerInterface|null $container
-     * @param Config|null $config
      */
     public function __construct(ContainerInterface $container = null)
     {
-        $this->container = new Container($container);
+        if ($container === null) {
+            $container = new ServiceLocator();
+        }
+
+        $this->container = $container;
         $this->resolver = new DependencyResolver($this->container);
 
-        if (!$this->container->has(Config::class)) {
-            $this->container->set(Config::class, new Config([]));
+        if ($this->container->has(Config::class)) {
+            $this->config = $this->container->get(Config::class);
+        } else {
+            $this->config = new Config([]);
         }
-        $this->config = $this->container->get(Config::class);
+
         $this->modules = [];
     }
 
