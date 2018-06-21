@@ -8,6 +8,7 @@ use Igni\Application\Exception\ApplicationException;
 use Igni\Http\Controller\ControllerAggregate;
 use Igni\Http\Exception\HttpModuleException;
 use Igni\Http\Middleware\ErrorMiddleware;
+use Igni\Http\Router\Route;
 use Igni\Http\Server\OnRequest;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -66,7 +67,7 @@ class Application
         if ($this->getContainer()->has(Router::class)) {
             $this->router = $this->getContainer()->get(Router::class);
         } else {
-            $this->router = new Router();
+            $this->router = new Router\Router();
         }
 
         if ($this->getContainer()->has(ControllerAggregate::class)) {
@@ -161,7 +162,7 @@ class Application
             $request->getUri()->getPath()
         );
 
-        $controller = $route->getDelegator();
+        $controller = $route->getController();
 
         if ($request instanceof ServerRequest) {
             $request = $request->withAttributes($route->getAttributes());

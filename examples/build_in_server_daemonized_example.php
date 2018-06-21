@@ -12,7 +12,7 @@ use Igni\Http\Server;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-$configuration = new Server\HttpConfiguration();
+$configuration = new Server\HttpConfiguration('0.0.0.0', 8080);
 $configuration->setDispatchMode(Server\HttpConfiguration::DISPATCH_MODULO);
 $configuration->setLogFile(__DIR__ . '/igni.log');
 $configuration->enableDaemon(__DIR__ . '/igni.pid');

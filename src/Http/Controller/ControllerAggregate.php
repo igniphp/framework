@@ -5,8 +5,8 @@ namespace Igni\Http\Controller;
 use Igni\Application\Controller\ControllerAggregate as ControllerAggregateInterface;
 use Igni\Application\Exception\ApplicationException;
 use Igni\Http\Controller;
-use Igni\Http\Route;
-use Igni\Http\Router;
+use Igni\Http\Router\Route;
+use Igni\Http\Router\Router;
 
 /**
  * Http application's controller aggregate.
@@ -34,13 +34,14 @@ class ControllerAggregate implements ControllerAggregateInterface
      *
      * @param callable|string $controller can be either callable or class implementing Igni\Http\Controller interface or its instance.
      * @param Route|null $route must be passed if callable is passed as a controller.
+     * @return Route
      *
      * @throws ApplicationException if passed controller is not valid.
      */
     public function add($controller, Route $route = null): void
     {
         if (is_callable($controller) && $route !== null) {
-            $route->delegate($controller);
+            $route = $route->withController($controller);
             $this->router->addRoute($route);
             return;
         }
@@ -48,7 +49,7 @@ class ControllerAggregate implements ControllerAggregateInterface
         if ($controller instanceof Controller) {
             /** @var Route $route */
             $route = $controller::getRoute();
-            $route->delegate($controller);
+            $route = $route->withController($controller);
             $this->router->addRoute($route);
             return;
         }
@@ -59,7 +60,7 @@ class ControllerAggregate implements ControllerAggregateInterface
         ) {
             /** @var Route $route */
             $route = $controller::getRoute();
-            $route->delegate($controller);
+            $route = $route->withController($controller);
             $this->router->addRoute($route);
             return;
         }

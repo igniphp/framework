@@ -2,7 +2,7 @@
 
 namespace IgniTestFunctional\Http;
 
-use Igni\Http\Route;
+use Igni\Http\Router\Route;
 use PHPUnit\Framework\TestCase;
 
 final class RouteTest extends TestCase
@@ -20,7 +20,7 @@ final class RouteTest extends TestCase
         $route = Route::get('/test/{var1}<\d+>');
         self::assertSame('test_var1', $route->getName());
 
-        $route->setName('test_route');
+        $route = Route::get('/test/{blabla}', 'test_route');
         self::assertSame('test_route', $route->getName());
     }
 }

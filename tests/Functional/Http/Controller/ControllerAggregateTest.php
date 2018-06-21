@@ -3,8 +3,8 @@
 namespace IgniTest\Funcational\Http\Controller;
 
 use Igni\Http\Controller\ControllerAggregate;
-use Igni\Http\Route;
-use Igni\Http\Router;
+use Igni\Http\Router\Route;
+use Igni\Http\Router\Router;
 use IgniTest\Fixtures\HttpController;
 use PHPUnit\Framework\TestCase;
 use Mockery;
@@ -23,12 +23,15 @@ class ControllerAggregateTest extends TestCase
     {
         $controller = function() {};
         $route = Mockery::mock(Route::class);
-        $route->shouldReceive('delegate')
+        $route->shouldReceive('withController')
             ->withArgs([$controller]);
 
         $router = Mockery::mock(Router::class);
         $router->shouldReceive('addRoute')
-            ->withArgs([$route]);
+            ->withArgs(function($route) {
+                self::assertInstanceOf(\Igni\Http\Route::class, $route);
+                return true;
+            });
         $aggregate = new ControllerAggregate($router);
 
         self::assertNull($aggregate->add($controller, $route));
