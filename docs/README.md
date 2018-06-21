@@ -405,9 +405,53 @@ Creates PSR-7 request with content type set to `application/xml` and body contai
 `$data` can be `\SimpleXMLElement`, `\DOMDocument` or just plain string.
 
 ## Error handling
-Igni provides default error handler so if anything goes wrong in your application the error will not be 
-directly propagated to the client layer. 
-`\Igni\Http\Middleware\ErrorMiddleware` is responsible for the error handling.
+Igni provides default error handler (`\Igni\Http\Middleware\ErrorMiddleware`) so if anything goes 
+wrong in your application the error will not be directly propagated to the client layer unless it
+is a fatal error (fatals cannot be catched nor handled).
+
+If you intend to propagate custom error for your clients, you have two options:
+- Custom exception classes implementing `\Igni\Http\Exception\HttpException`
+- Provide custom error handling middleware
+
+
+### Custom Exceptions 
+All exceptions that implement `\Igni\Http\Exception\HttpException` are catch by default error handler and used
+to generate response for your clients:
+
+```php
+<?php
+// Include composer's autoloader.
+require_once __DIR__.'/vendor/autoload.php';
+
+use Igni\Http\Exception\HttpException;
+
+class NotFoundException extends \RuntimeException implements HttpException
+{
+    public function getHttpStatusCode() 
+    {
+        return 404;
+    }
+    
+    public function getHttpBody() 
+    {
+        return json_encode([
+            'error_message' => $this->getMessage(),    
+        ]);
+    }
+    
+}
+
+$application = new Igni\Http\Application();
+$application->get('/article/{id}', function() {
+    throw new NotFoundException('Article with given id does not exists');
+});
+
+// Run the application.
+$application->run();
+```
+ 
+
+### Custom error handling middleware
 
 In any case you would like to provide custom error handler, it can be done by simply creating middleware with try/catch
 statement inside `process` method. 
