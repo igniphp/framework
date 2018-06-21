@@ -67,7 +67,7 @@ class Application
         if ($this->getContainer()->has(Router::class)) {
             $this->router = $this->getContainer()->get(Router::class);
         } else {
-            $this->router = new Router();
+            $this->router = new Router\Router();
         }
 
         if ($this->getContainer()->has(ControllerAggregate::class)) {

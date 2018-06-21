@@ -2,8 +2,7 @@
 
 namespace Igni\Http\Router;
 
-use Igni\Http\Exception\MethodNotAllowedException;
-use Igni\Http\Exception\NotFoundException;
+use Igni\Http\Exception\GenericHttpException;;
 use Igni\Http\Route;
 use Igni\Http\Router as RouterInterface;
 use Symfony\Component\Routing\Route as SymfonyRoute;
@@ -60,9 +59,9 @@ class Router implements RouterInterface
         try {
             $route = $matcher->match($path);
         } catch (ResourceNotFoundException $exception) {
-            throw NotFoundException::notFound($path, $method);
+            throw GenericHttpException::invalidUri($path, $method);
         } catch (SymfonyMethodNotAllowedException $exception) {
-            throw MethodNotAllowedException::methodNotAllowed($path, $method, $exception->getAllowedMethods());
+            throw GenericHttpException::methodNotAllowed($path, $method, $exception->getAllowedMethods());
         }
 
         $routeName = $route['_route'];

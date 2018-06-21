@@ -3,7 +3,6 @@
 namespace IgniTestFunctional\Http;
 
 use Igni\Http\Exception\GenericHttpException;
-use Igni\Http\Route;
 use Igni\Http\Router\Route;
 use Igni\Http\Router\Router;
 use PHPUnit\Framework\TestCase;
