@@ -50,7 +50,7 @@ Requirements:
  - [swoole](https://github.com/swoole/swoole-src) extension for build-in http server support
 
 ### Quick start
-Alternatively you can start using framework by using [quick start repo](https://github.com/igniphp/framework-quick-start) which contains bootstrap application.
+Alternatively you can start using framework with [quick start](https://github.com/igniphp/framework-quick-start) which contains bootstrap application.
 
 ## Features
 
