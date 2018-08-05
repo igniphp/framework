@@ -10,6 +10,7 @@ use Igni\Http\Exception\HttpModuleException;
 use Igni\Http\Middleware\CallableMiddleware;
 use Igni\Http\Middleware\ErrorMiddleware;
 use Igni\Http\Middleware\MiddlewarePipe;
+use Igni\Http\Route as RouteInterface;
 use Igni\Http\Router\Route;
 use Igni\Http\Server\OnRequest;
 use Psr\Container\ContainerInterface;
@@ -289,9 +290,27 @@ class Application
         $this->controllerAggregate->add($controller, Route::options($route));
     }
 
+    /**
+     * Registers new controller that accepts head request
+     * when request uri matches passed route pattern.
+     *
+     * @param string $route
+     * @param callable $controller
+     */
     public function head(string $route, callable $controller): void
     {
         $this->controllerAggregate->add($controller, Route::head($route));
+    }
+
+    /**
+     * Registers new controller that listens on the passed route.
+     *
+     * @param RouteInterface $route
+     * @param callable $controller
+     */
+    public function on(RouteInterface $route, callable $controller): void
+    {
+        $this->controllerAggregate->add($controller, $route);
     }
 
     /**
