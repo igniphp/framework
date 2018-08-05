@@ -1,11 +1,13 @@
 {
   "name": "igniphp/framework",
-  "description": "PSR-7, PSR-15 modular micro framework.",
+  "description": "Swoole, PSR-7, PSR-15 modular micro anti-framework.",
   "keywords": [
+    "swoole",
     "http",
     "psr-7",
     "psr-15",
     "middleware",
+    "micro",
     "framework"
   ],
   "support": {
