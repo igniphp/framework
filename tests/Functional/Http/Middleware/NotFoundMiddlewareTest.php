@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace IgniTest\Funcational\Http\Middleware;
+namespace Igni\Tests\Functional\Http\Middleware;
 
 use Igni\Http\Exception\GenericHttpException;
 use Igni\Http\Middleware\NotFoundMiddleware;

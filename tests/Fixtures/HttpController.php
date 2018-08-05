@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace IgniTest\Fixtures;
+namespace Igni\Tests\Fixtures;
 
 use Igni\Http\Controller;
 use Igni\Http\Response;
+use Igni\Http\Route as RouteInterface;
 use Igni\Http\Router\Route;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,7 +18,7 @@ class HttpController implements Controller
         return Response::fromText('test controller');
     }
 
-    public static function getRoute(): Route
+    public static function getRoute(): RouteInterface
     {
         return Route::get(self::URI);
     }

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace IgniTest\Fixtures;
+namespace Igni\Tests\Fixtures;
 
 class Boo
 {

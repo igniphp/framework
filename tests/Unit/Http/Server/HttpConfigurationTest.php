@@ -48,6 +48,7 @@ final class HttpConfigurationTest extends TestCase
                 'pid_file' => 'pid',
                 'dispatch_mode' => 2,
                 'log_file' => 'log',
+                'log_level' => 1,
                 'worker_num' => 2,
                 'max_conn' => 10,
                 'backlog' => 2,

@@ -10,14 +10,14 @@ class RouterException extends RuntimeException implements HttpException
 {
     private $httpStatus;
 
-    public static function noRouteMatchesRequestedUri(string $uri): RouterException
+    public static function noRouteMatchesRequestedUri(string $uri): self
     {
         $exception = new self("No route matches requested uri `$uri`.");
         $exception->httpStatus = 404;
         return $exception;
     }
 
-    public static function methodNotAllowed(string $uri, array $allowedMethods): RouterException
+    public static function methodNotAllowed(string $uri, array $allowedMethods): self
     {
         $allowedMethods = implode(', ', $allowedMethods);
         $exception = new self("This uri `$uri` allows only $allowedMethods http methods.");
@@ -25,7 +25,7 @@ class RouterException extends RuntimeException implements HttpException
         return $exception;
     }
 
-    public static function invalidRoute($given): RouterException
+    public static function invalidRoute($given): self
     {
 
         $exception = new self(sprintf(

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace IgniTest\Functional\Http;
+namespace Igni\Tests\Functional\Http;
 
 use Igni\Http\Server;
 use Mockery;

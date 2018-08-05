@@ -7,7 +7,10 @@ use Igni\Application\Controller\ControllerAggregate as AbstractControllerAggrega
 use Igni\Application\Exception\ApplicationException;
 use Igni\Http\Controller\ControllerAggregate;
 use Igni\Http\Exception\HttpModuleException;
+use Igni\Http\Middleware\CallableMiddleware;
 use Igni\Http\Middleware\ErrorMiddleware;
+use Igni\Http\Middleware\MiddlewarePipe;
+use Igni\Http\Route as RouteInterface;
 use Igni\Http\Router\Route;
 use Igni\Http\Server\OnRequest;
 use Psr\Container\ContainerInterface;
@@ -16,10 +19,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
-use Zend\Diactoros\Response\EmitterInterface;
-use Zend\Diactoros\Response\SapiEmitter;
-use Zend\Stratigility\Middleware\CallableMiddlewareDecorator;
-use Zend\Stratigility\MiddlewarePipe;
+use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
+use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
 /**
  * @see \Igni\Application\Application
@@ -136,10 +137,13 @@ class Application
     {
         if (!is_subclass_of($middleware, MiddlewareInterface::class)) {
             if (!is_callable($middleware)) {
-                throw new ApplicationException('Middleware must be either class or object that implements ' . MiddlewareInterface::class);
+                throw new ApplicationException(sprintf(
+                    'Middleware must be either class or object that implements `%s`',
+                    MiddlewareInterface::class
+                ));
             }
 
-            $middleware = new CallableMiddlewareDecorator($middleware);
+            $middleware = new CallableMiddleware($middleware);
         }
 
         $this->middleware[] = $middleware;
@@ -286,9 +290,27 @@ class Application
         $this->controllerAggregate->add($controller, Route::options($route));
     }
 
+    /**
+     * Registers new controller that accepts head request
+     * when request uri matches passed route pattern.
+     *
+     * @param string $route
+     * @param callable $controller
+     */
     public function head(string $route, callable $controller): void
     {
         $this->controllerAggregate->add($controller, Route::head($route));
+    }
+
+    /**
+     * Registers new controller that listens on the passed route.
+     *
+     * @param RouteInterface $route
+     * @param callable $controller
+     */
+    public function on(RouteInterface $route, callable $controller): void
+    {
+        $this->controllerAggregate->add($controller, $route);
     }
 
     /**
@@ -307,22 +329,22 @@ class Application
             return $this->pipeline;
         }
 
-        return $this->pipeline = $this->createPipeline();
+        return $this->pipeline = $this->composeMiddlewarePipe();
     }
 
-    private function createPipeline(): MiddlewarePipe
+    private function composeMiddlewarePipe(): MiddlewarePipe
     {
         $pipe = new MiddlewarePipe();
-        $pipe->pipe(new ErrorMiddleware(function(Throwable $exception) {
+        $pipe->add(new ErrorMiddleware(function(Throwable $exception) {
             $this->handleOnErrorListeners($exception);
         }));
         foreach ($this->middleware as $middleware) {
             if (is_string($middleware)) {
                 $middleware = $this->resolver->resolve($middleware);
             }
-            $pipe->pipe($middleware);
+            $pipe->add($middleware);
         }
-        $pipe->pipe($this);
+        $pipe->add($this);
 
         return $pipe;
     }

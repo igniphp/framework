@@ -34,7 +34,6 @@ class ControllerAggregate implements ControllerAggregateInterface
      *
      * @param callable|string $controller can be either callable or class implementing Igni\Http\Controller interface or its instance.
      * @param Route|null $route must be passed if callable is passed as a controller.
-     * @return Route
      *
      * @throws ApplicationException if passed controller is not valid.
      */

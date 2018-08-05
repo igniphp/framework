@@ -2,6 +2,8 @@
 
 namespace Igni\Application;
 
+use Igni\Application\Exception\ConfigException;
+
 /**
  * Application's config container.
  * Treats dots as an operator for accessing nested values.
@@ -86,6 +88,23 @@ class Config
     }
 
     /**
+     * Returns new instance of the config containing only values from the
+     * given namespace.
+     *
+     * @param string $namespace
+     * @return Config
+     */
+    public function extract(string $namespace): Config
+    {
+        $extracted = $this->get($namespace);
+        if (!is_array($extracted)) {
+            throw ConfigException::forExtractionFailure($namespace);
+        }
+
+        return new self($extracted);
+    }
+
+    /**
      * Sets new value.
      *
      * @param string $key
@@ -114,6 +133,31 @@ class Config
     public function toArray(): array
     {
         return $this->config;
+    }
+
+    /**
+     * Returns flat array representation of the config, all nested values are stored
+     * in keys containing path separated by dot.
+     *
+     * @return array
+     */
+    public function toFlatArray(): array
+    {
+        return self::flatten($this->config);
+    }
+
+    private static function flatten(array &$array, string $prefix = ''): array
+    {
+        $values = [];
+        foreach ($array as $key => &$value) {
+            if (is_array($value) && !empty($value)) {
+                $values = array_merge($values, self::flatten($value, $prefix . $key . '.'));
+            } else {
+                $values[$prefix . $key] = $value;
+            }
+        }
+
+        return $values;
     }
 
     private function fetchConstants($value)

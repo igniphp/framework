@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace IgniTest\Funcational\Http\Middleware;
+namespace Igni\Tests\Functional\Http\Middleware;
 
 use Igni\Application\Exception\ApplicationException;
 use Igni\Http\Middleware\ErrorMiddleware;
-use IgniTest\Fixtures\CustomHttpException;
+use Igni\Tests\Fixtures\CustomHttpException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;

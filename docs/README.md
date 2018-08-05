@@ -31,13 +31,14 @@ Licensed under MIT License.
 ## Overview
 
 ### Introduction
-**Igni** framework allows you to write extensible and middleware based REST applications which are [PSR-7](https://www.php-fig.org/psr/psr-7/) and [PSR-15](https://www.php-fig.org/psr/psr-15/) compliant.
+**Igni** anti-framework allows you to write extensible and middleware based REST applications which are [PSR-7](https://www.php-fig.org/psr/psr-7/) and [PSR-15](https://www.php-fig.org/psr/psr-15/) compliant.
 
 Igni aims to be:
  - Lightweight: Igni's source code is around 60KB.
  - Extensible: Igni offers extension system that allows to use `PSR-15` middleware (with `zend-stratigility`) and modular architecture.
  - Testable: Igni extends `zend-diactoros` (`PSR-7` implementation) and allows to manually dispatch routes to perform end-to-end tests.
  - Easy to use: Igni exposes an intuitive and concise API. All you need to do to use it is to include composer autoloader.
+ - Transparent: dont bind your application to the framework.
 
 ### Installation
 
@@ -67,9 +68,9 @@ $application->get('/hello/{name}', function (\Psr\Http\Message\ServerRequestInte
 // Run the application
 $application->run();
 ```
-First we include composer's autoloader. 
-Instantiation of application happens next than simply controller is attached to the `GET /hello/{name}` request pattern.
-And application is run.
+First composer's autoloader is included in the application. Next instantiation of application happens. 
+In line `64` callable controller is attached to the `GET /hello/{name}` route.
+Finally application is being run.
 
 Similar approach is taken when build-in server comes in place:
 
@@ -88,7 +89,7 @@ $application->run(new Igni\Http\Server());
 ```
 
 Server instance is created and passed to application's `run` method.
-While using default settings it listens on incoming localhost connections at port `8080`.
+While using default settings it listens on incoming localhost connections on port `8080`.
 
 ## Routing
 
@@ -109,12 +110,16 @@ Here are some examples:
 
 ```php
 <?php
+use Igni\Http\Router\Route;
 
 // Matches following get requests: /users/42, /users/1, but not /users/me 
 $application->get('/users/{id<\d+>}', function() {...});
 
 // Matches following get requests: /users/42, /users/me
 $application->get('/users/{name<\w+>}', function() {...});
+
+// Bind controller to custom route instance
+$application->on(new Route('/hello/{name<\w+>}', ['GET', 'DELETE', 'POST']), function() {...});
 ```
 
 ### Default value
@@ -153,6 +158,10 @@ $application->get('/hello/{name}', function ($request) {
 });
 $application->run();
 ```
+
+#### `Application::on(Route $route, callable $controller)`
+
+Makes `$controller` to listen on instance of the `$route`. 
 
 #### `Application::get(string $route, callable $controller)`
 
@@ -208,7 +217,7 @@ Middleware can be used to:
  - Perform content negotiation
  - Error handling
 
-In Igni middleware can be any closure that accepts `\Psr\Http\Message\ServerRequestInterface` and `\Psr\Http\Server\RequestHandlerInterface` as parameters 
+In Igni middleware can be any callable that accepts `\Psr\Http\Message\ServerRequestInterface` and `\Psr\Http\Server\RequestHandlerInterface` or `callable` as parameters 
 and returns valid instance of `\Psr\Http\Message\ResponseInterface` or any class/object that implements `\Psr\Http\Server\MiddlewareInterface` interface.
 
 You can add as many middleware as you want, and they are triggered in the same order as you add them. 
@@ -230,6 +239,7 @@ class BenchmarkMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface 
     {
         $time = microtime(true);
+        // $response = $next($request); or the psr-15 way:
         $response = $next->handle($request);
         $renderTime = microtime(true) - $time;
         
@@ -242,9 +252,9 @@ $application = new Igni\Http\Application();
 // Attach custom middleware instance.
 $application->use(new BenchmarkMiddleware());
 
-// Attach closure middleware.
-$application->use(function(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface {
-    $response = $next->handle($request);
+// Attach callable middleware.
+$application->use(function($request, callable $next) {
+    $response = $next($request);
     return $response->withHeader('foo', 'bar');
 });
 
@@ -414,7 +424,6 @@ If you intend to propagate custom error for your clients, you have two options:
 - Custom exception classes implementing `\Igni\Http\Exception\HttpException`
 - Provide custom error handling middleware
 
-
 ### Custom Exceptions 
 All exceptions that implement `\Igni\Http\Exception\HttpException` are catch by default error handler and used
 to generate response for your clients:
@@ -512,7 +521,7 @@ class WelcomeUserController implements Igni\Http\Controller
     
     public static function getRoute(): Route 
     {
-        return Route::get('hi/{name}');
+        return \Igni\Http\Router\Route::get('hi/{name}');
     }
 }
 

@@ -5,3 +5,4 @@
 /tests/cache/*
 /coverage.clover
 /coverage
+/tests/.phpunit.result.cache

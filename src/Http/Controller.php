@@ -3,7 +3,6 @@
 namespace Igni\Http;
 
 use Igni\Application\Controller as ControllerInterface;
-use Igni\Http\Router\Route;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -26,7 +25,7 @@ interface Controller extends ControllerInterface
     /**
      * Returns the route pattern that will be handled by controller.
      *
-     * @return \Igni\Http\Router\Route
+     * @return \Igni\Http\Route
      */
     public static function getRoute(): Route;
 }
