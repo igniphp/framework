@@ -13,14 +13,12 @@ class HttpConfiguration
     public const DISPATCH_PREEMPTIVE_ASSIGNMENT = 3;
     public const DEFAULT_ADDRESS = '0.0.0.0';
     public const DEFAULT_PORT = 80;
-
     public const LOG_DEBUG = 0;
     public const LOG_TRACE = 1;
     public const LOG_INFO = 2;
     public const LOG_NOTICE = 3;
     public const LOG_WARNING = 4;
     public const LOG_ERROR = 5;
-
 
     /**
      * @var array
