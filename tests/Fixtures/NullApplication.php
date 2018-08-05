@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace IgniTest\Fixtures;
+namespace Igni\Tests\Fixtures;
 
 use Igni\Application\Application;
 use Igni\Application\Controller;

@@ -14,6 +14,14 @@ class HttpConfiguration
     public const DEFAULT_ADDRESS = '0.0.0.0';
     public const DEFAULT_PORT = 80;
 
+    public const LOG_DEBUG = 0;
+    public const LOG_TRACE = 1;
+    public const LOG_INFO = 2;
+    public const LOG_NOTICE = 3;
+    public const LOG_WARNING = 4;
+    public const LOG_ERROR = 5;
+
+
     /**
      * @var array
      */
@@ -97,12 +105,15 @@ class HttpConfiguration
 
     /**
      * Sets path to the file that will be used to persist server log.
+     * Log level can also be set as an additional parameter.
      *
      * @param string $filename
+     * @param int $logLevel
      */
-    public function setLogFile(string $filename): void
+    public function setLogFile(string $filename, int $logLevel = self::LOG_TRACE): void
     {
         $this->settings['log_file'] = $filename;
+        $this->settings['log_level'] = $logLevel;
     }
 
     /**

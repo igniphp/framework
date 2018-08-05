@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace IgniTestFunctional\Http;
+namespace Igni\Tests\Functional\Http;
 
 use Igni\Http\Router\Route;
 use PHPUnit\Framework\TestCase;

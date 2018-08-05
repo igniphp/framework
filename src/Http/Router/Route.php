@@ -218,7 +218,7 @@ class Route implements RouteInterface
      * @param string $path
      * @return string
      */
-    private static function generateNameFromPath(string $path): string
+    public static function generateNameFromPath(string $path): string
     {
         $path = preg_replace('/<[^>]+>/', '', $path);
         return str_replace(['{', '}', '?', '.', '/'], ['', '', '', '_', '_'], trim($path, '/'));

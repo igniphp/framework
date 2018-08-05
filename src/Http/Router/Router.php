@@ -33,11 +33,15 @@ class Router implements RouterInterface
     /**
      * Registers new route.
      *
-     * @param \Igni\Http\Router\Route $route
+     * @param Route $route
      */
     public function addRoute(Route $route): void
     {
-        $name = $route->getName();
+        if ($route instanceof \Igni\Http\Router\Route) {
+            $name = $route->getName();
+        } else {
+            $name = \Igni\Http\Router\Route::generateNameFromPath($route->getPath());
+        }
 
         $baseRoute = new SymfonyRoute($route->getPath());
         $baseRoute->setMethods($route->getMethods());

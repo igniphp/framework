@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace IgniTest\Fixtures\Modules;
+namespace Igni\Tests\Fixtures\Modules;
 
 use Igni\Application\Providers\ServiceProvider;
 use Igni\Container\ServiceLocator;

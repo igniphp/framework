@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace IgniTest\Funcational\Http\Controller;
+namespace Igni\Tests\Functional\Http\Controller;
 
 use Igni\Http\Controller\ControllerAggregate;
 use Igni\Http\Router\Route;
 use Igni\Http\Router\Router;
-use IgniTest\Fixtures\HttpController;
-use PHPUnit\Framework\TestCase;
+use Igni\Tests\Fixtures\HttpController;
 use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class ControllerAggregateTest extends TestCase
 {

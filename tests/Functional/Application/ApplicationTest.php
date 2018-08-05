@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace IgniTestFunctional\Application;
+namespace Igni\Tests\Functional\Application;
 
+use Igni\Application\Application;
 use Igni\Application\Config;
 use Igni\Application\Controller\ControllerAggregate;
 use Igni\Application\Exception\ApplicationException;
 use Igni\Application\Listeners\OnBootListener;
 use Igni\Application\Providers\ControllerProvider;
+use Igni\Tests\Fixtures\NullApplication;
 use PHPUnit\Framework\TestCase;
-use IgniTest\Fixtures\NullApplication;
-use Igni\Application\Application;
 
 final class ApplicationTest extends TestCase
 {

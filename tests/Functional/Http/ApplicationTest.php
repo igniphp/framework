@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace IgniTestFunctional\Http;
+namespace Igni\Tests\Functional\Http;
 
 use Igni\Application\Application as AbstractApplication;
 use Igni\Application\Listeners\OnBootListener;
@@ -60,6 +60,27 @@ final class ApplicationTest extends TestCase
 
         $application->use(function(ServerRequestInterface $request, RequestHandlerInterface $next) use ($body) {
             $response = $next->handle($request);
+
+            return $response->withBody(Stream::fromString($body));
+        });
+
+        $request = ServerRequest::fromUri('/test/1');
+        $response = $application->handle($request);
+
+        self::assertEquals($body, (string) $response->getBody());
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testProcessWithCallableMiddlewareHandler(): void
+    {
+        $body = 'No content available.';
+        $application = new Application();
+        $application->get('/test/{id}', function(ServerRequest $request): ResponseInterface {
+            return Response::fromJson(['test' => (int) $request->getAttribute('id')]);
+        });
+
+        $application->use(function(ServerRequestInterface $request, $next) use ($body) {
+            $response = $next($request);
 
             return $response->withBody(Stream::fromString($body));
         });
