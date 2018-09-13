@@ -1,8 +1,8 @@
 # ![Igni logo](https://github.com/igniphp/common/blob/master/logo/full.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Build Status](https://travis-ci.org/igniphp/framework.svg?branch=master)](https://travis-ci.org/igniphp/framework)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/igniphp/framework/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/igniphp/framework/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/igniphp/framework/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/igniphp/framework/?branch=master)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 Igni is a php7 anti-framework with built-in [swoole server](https://www.swoole.co.uk) and modular architecture support to 
 help you quickly write scalable PSR-7 and PSR-15 compilant REST services.
@@ -14,17 +14,16 @@ Its main objective it to be as much transparent and as less visible for your app
 require 'vendor/autoload.php';
 
 use Igni\Application\Config;
+use Igni\Application\HttpApplication;
 use Igni\Application\Providers\ConfigProvider;
-use Igni\Http\Application;
-use Igni\Http\Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Server\RequestHandlerInterface;
+use Igni\Network\Http\Response;
+use Igni\Network\Http\Request;
 
-$application = new Application();
+$application = new HttpApplication();
 
 // Routing
 $application->get('/hello/{name}', function (Request $request) : Response {
-    return Response::fromText("Hello {$request->getAttribute('name')}.");
+    return Response::asText("Hello {$request->getAttribute('name')}.");
 });
 
 // Middleware - no interfaces no binding with framework code is required in order things to work.

@@ -2,7 +2,6 @@
 
 namespace Igni\Application;
 
-use Igni\Application\Controller\ControllerAggregate;
 use Igni\Application\Exception\ApplicationException;
 use Igni\Application\Listeners\OnBootListener;
 use Igni\Application\Listeners\OnErrorListener;
@@ -95,9 +94,10 @@ abstract class Application
     abstract public function run();
 
     /**
-     * @return ControllerAggregate
+     * Controller aggregator is used to register application's controllers.
+     * @return ControllerAggregator
      */
-    abstract public function getControllerAggregate(): ControllerAggregate;
+    abstract public function getControllerAggregator(): ControllerAggregator;
 
     /**
      * @return Config
@@ -130,13 +130,15 @@ abstract class Application
         }
     }
 
-    protected function handleOnErrorListeners(Throwable $exception): void
+    protected function handleOnErrorListeners(Throwable $exception): Throwable
     {
         foreach ($this->modules as $module) {
             if ($module instanceof OnErrorListener) {
-                $module->onError($this, $exception);
+                $exception = $module->onError($this, $exception);
             }
         }
+
+        return $exception;
     }
 
     protected function handleOnRunListeners(): void
@@ -172,7 +174,7 @@ abstract class Application
         }
 
         if ($module instanceof ControllerProvider) {
-            $module->provideControllers($this->getControllerAggregate());
+            $module->provideControllers($this->getControllerAggregator());
         }
 
         if ($module instanceof ServiceProvider) {

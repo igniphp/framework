@@ -6,24 +6,23 @@ require_once __DIR__.'/../vendor/autoload.php';
  * To kill process simply run from the terminal: kill -9 `cat ./igni.pid`.
  */
 
-use Igni\Http\Application;
-use Igni\Http\Response;
-use Igni\Http\Server;
+use Igni\Application\HttpApplication;
+use Igni\Network\Http\Response;
+use Igni\Network\Server\Configuration;
+use Igni\Network\Server\HttpServer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-$configuration = new Server\HttpConfiguration('0.0.0.0', 8080);
-$configuration->setDispatchMode(Server\HttpConfiguration::DISPATCH_MODULO);
-$configuration->setLogFile(__DIR__ . '/igni.log');
+$configuration = new Configuration('0.0.0.0', 8080);
 $configuration->enableDaemon(__DIR__ . '/igni.pid');
 
 // Setup server
-$server = new Server($configuration);
+$server = new HttpServer($configuration);
 
 // Setup application and routes
-$application = new Application();
+$application = new HttpApplication();
 $application->get('/hello/{name}', function (ServerRequestInterface $request) : ResponseInterface {
-    return Response::fromText("Hello {$request->getAttribute('name')}");
+    return Response::asText("Hello {$request->getAttribute('name')}");
 });
 
 // Run the server

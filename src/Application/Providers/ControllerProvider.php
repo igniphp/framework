@@ -2,7 +2,7 @@
 
 namespace Igni\Application\Providers;
 
-use Igni\Application\Controller\ControllerAggregate;
+use Igni\Application\ControllerAggregator;
 
 /**
  * Can be implemented by module to register controllers in the application scope.
@@ -11,8 +11,5 @@ use Igni\Application\Controller\ControllerAggregate;
  */
 interface ControllerProvider
 {
-    /**
-     * @param ControllerAggregate $controllers
-     */
-    public function provideControllers(ControllerAggregate $controllers): void;
+    public function provideControllers(ControllerAggregator $aggregator): void;
 }

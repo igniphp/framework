@@ -2,10 +2,12 @@
 namespace Examples\Modules;
 
 use Examples\Controllers\GoodbyeController;
-use Igni\Application\Controller\ControllerAggregate;
+use Igni\Application\ControllerAggregator;
+use Igni\Application\HttpApplication;
 use Igni\Application\Providers\ControllerProvider;
-use Igni\Http\Response;
-use Igni\Http\Router\Route;
+use Igni\Network\Http\Response;
+use Igni\Network\Http\Route;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Module definition.
@@ -13,14 +15,14 @@ use Igni\Http\Router\Route;
 class SimpleModule implements ControllerProvider
 {
     /**
-     * @param \Igni\Http\Controller\ControllerAggregate $controllers
+     * @param HttpApplication|ControllerAggregator $controllers
      */
-    public function provideControllers(ControllerAggregate $controllers): void
+    public function provideControllers(ControllerAggregator $controllers): void
     {
-        $controllers->add(function ($request) {
-            return Response::fromText("Hello {$request->getAttribute('name')}!");
+        $controllers->register(function (ServerRequestInterface $request) {
+            return Response::asText("Hello {$request->getAttribute('name')}!");
         }, Route::get('/hello/{name}'));
 
-        $controllers->add(GoodbyeController::class);
+        $controllers->register(GoodbyeController::class);
     }
 }

@@ -11,11 +11,5 @@ use Igni\Application\Application;
  */
 interface OnBootListener
 {
-    /**
-     * Keeps on-boot listener logic.
-     *
-     * @param Application $application
-     * @return mixed
-     */
-    public function onBoot(Application $application);
+    public function onBoot(Application $application): void;
 }

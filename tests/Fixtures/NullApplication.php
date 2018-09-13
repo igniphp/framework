@@ -4,7 +4,7 @@ namespace Igni\Tests\Fixtures;
 
 use Igni\Application\Application;
 use Igni\Application\Controller;
-use Igni\Application\Controller\ControllerAggregate;
+use Igni\Application\ControllerAggregator;
 use Igni\Container\ServiceLocator;
 
 class NullApplication extends Application
@@ -21,7 +21,7 @@ class NullApplication extends Application
         $this->handleOnShutDownListeners();
     }
 
-    public function getControllerAggregate(): ControllerAggregate
+    public function getControllerAggregator(): ControllerAggregator
     {
         static $aggregate;
 
@@ -30,7 +30,7 @@ class NullApplication extends Application
         }
         $locator = $this->getContainer();
 
-        return $aggregate = new class($locator) implements ControllerAggregate {
+        return $aggregate = new class($locator) implements ControllerAggregator {
 
             /**
              * @var ServiceLocator
@@ -42,7 +42,7 @@ class NullApplication extends Application
                 $this->locator = $locator;
             }
 
-            public function add($controller, string $name = null): void
+            public function register($controller, string $name = null): void
             {
                 if ($controller) {
                     $this->locator->set($name, $controller);

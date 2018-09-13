@@ -2,7 +2,9 @@
 
 namespace Igni\Tests\Fixtures;
 
-use Igni\Http\Exception\HttpException;
+use Igni\Network\Exception\HttpException;
+use Igni\Network\Http\Response;
+use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Throwable;
 
@@ -13,16 +15,11 @@ class CustomHttpException extends RuntimeException implements HttpException
         parent::__construct($message, $code, $previous);
     }
 
-    public function getHttpStatusCode(): int
+    public function asResponse(): ResponseInterface
     {
-        return $this->getCode();
-    }
-
-    public function getHttpBody(): string
-    {
-        return json_encode([
+        return Response::asJson([
             'error_code' => $this->getCode(),
             'error_message' => $this->getMessage(),
-        ]);
+        ], $this->getCode());
     }
 }

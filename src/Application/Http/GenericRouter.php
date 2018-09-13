@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Igni\Http\Router;
+namespace Igni\Application\Http;
 
-use Igni\Http\Exception\GenericHttpException;;
-use Igni\Http\Route;
-use Igni\Http\Router as RouterInterface;
-use Symfony\Component\Routing\Route as SymfonyRoute;
+use Igni\Network\Http\Router;
+use Igni\Network\Exception\RouterException;
+use Igni\Network\Http\Route;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException as SymfonyMethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Route as SymfonyRoute;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @package Igni\Http\Router
  */
-class Router implements RouterInterface
+class GenericRouter implements Router
 {
     /** @var RouteCollection */
     protected $routeCollection;
@@ -35,12 +35,12 @@ class Router implements RouterInterface
      *
      * @param Route $route
      */
-    public function addRoute(Route $route): void
+    public function add(Route $route): void
     {
-        if ($route instanceof \Igni\Http\Router\Route) {
+        if ($route instanceof Route) {
             $name = $route->getName();
         } else {
-            $name = \Igni\Http\Router\Route::generateNameFromPath($route->getPath());
+            $name = Route::generateNameFromPath($route->getPath());
         }
 
         $baseRoute = new SymfonyRoute($route->getPath());
@@ -57,15 +57,15 @@ class Router implements RouterInterface
      * @param string $path request path.
      * @return Route
      */
-    public function findRoute(string $method, string $path): Route
+    public function find(string $method, string $path): Route
     {
         $matcher = new UrlMatcher($this->routeCollection, new RequestContext('/', $method));
         try {
             $route = $matcher->match($path);
         } catch (ResourceNotFoundException $exception) {
-            throw GenericHttpException::invalidUri($path, $method);
+            throw RouterException::noRouteMatchesRequestedUri($path, $method);
         } catch (SymfonyMethodNotAllowedException $exception) {
-            throw GenericHttpException::methodNotAllowed($path, $method, $exception->getAllowedMethods());
+            throw RouterException::methodNotAllowed($path, $exception->getAllowedMethods());
         }
 
         $routeName = $route['_route'];

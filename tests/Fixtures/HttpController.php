@@ -2,10 +2,10 @@
 
 namespace Igni\Tests\Fixtures;
 
-use Igni\Http\Controller;
-use Igni\Http\Response;
-use Igni\Http\Route as RouteInterface;
-use Igni\Http\Router\Route;
+use Igni\Application\Http\Controller;
+use Igni\Network\Http\Route;
+use Igni\Network\Http\Response;
+use Igni\Network\Http\Route as IgniNetworkHttpRoute;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -15,10 +15,10 @@ class HttpController implements Controller
 
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
-        return Response::fromText('test controller');
+        return Response::asText('test controller');
     }
 
-    public static function getRoute(): RouteInterface
+    public static function getRoute(): IgniNetworkHttpRoute
     {
         return Route::get(self::URI);
     }
