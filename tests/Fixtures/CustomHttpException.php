@@ -15,7 +15,7 @@ class CustomHttpException extends RuntimeException implements HttpException
         parent::__construct($message, $code, $previous);
     }
 
-    public function asResponse(): ResponseInterface
+    public function toResponse(): ResponseInterface
     {
         return Response::asJson([
             'error_code' => $this->getCode(),
