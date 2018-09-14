@@ -54,6 +54,11 @@ Requirements:
  - php 7.1 or better
  - [swoole](https://github.com/swoole/swoole-src) extension for build-in http server support
 
+### What's new
+
+With version 2.0 network package was extracted from the framework code, error handling was 
+overall improved as well as Server's listeners. More details can be found in changelog file.
+
 ### Quick start
 Alternatively you can start using framework with [quick start](https://github.com/igniphp/framework-quick-start) which contains bootstrap application.
 
