@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Igni\Http;
+namespace Igni\Application\Http;
 
 use Psr\Http\Server\MiddlewareInterface;
 
 /**
- * Represents middleware aggregator. Used by http application.
+ * Used by http application.
  *
- * @package Igni\Http
+ * @package Igni\Application
  */
-interface MiddlewareAggregate
+interface MiddlewareAggregator
 {
     /**
      * @param string|MiddlewareInterface|callable $middleware

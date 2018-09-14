@@ -7,19 +7,13 @@ use Igni\Application\Application;
 use Throwable;
 
 /**
- * Can be implemented by module to perform tasks when error occurs
- * when application is running.
+ * Can be implemented by module to perform tasks when error occurs, exception can be
+ * overridden by the handler - this can be useful when there is requirement for
+ * displaying custom responses when given exception occurs.
  *
  * @package Igni\Application\Listeners
  */
 interface OnErrorListener
 {
-    /**
-     * Keeps on-error listener logic.
-     *
-     * @param Application $application
-     * @param Throwable $exception
-     * @return mixed
-     */
-    public function onError(Application $application, Throwable $exception);
+    public function onError(Application $application, Throwable $exception): Throwable;
 }

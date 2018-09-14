@@ -11,11 +11,5 @@ use Igni\Application\Application;
  */
 interface OnShutDownListener
 {
-    /**
-     * Keeps on-shutdown listener logic.
-     *
-     * @param Application $application
-     * @return mixed
-     */
-    public function onShutDown(Application $application);
+    public function onShutDown(Application $application): void;
 }

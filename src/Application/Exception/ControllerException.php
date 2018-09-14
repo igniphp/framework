@@ -2,18 +2,22 @@
 
 namespace Igni\Application\Exception;
 
-use Igni\Exception\RuntimeException;
-use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ResponseInterface;
+use Serializable;
 
-class ControllerException extends RuntimeException implements NotFoundExceptionInterface
+class ControllerException extends ApplicationException
 {
-    public static function forUndefinedController(string $controller): ControllerException
+    public static function forMissingController(string $route): self
     {
-        return new self("Controller ${controller} not found.");
+        return new self("Could not retrieve controller for route $route");
     }
 
-    public static function forMissingOption(string $option): ControllerException
+    public static function forInvalidReturnValue(): self
     {
-        return new self("Missing option `${option}` not found.");
+        return new self(sprintf(
+            'Invalid response returned by controller, controller must return %s or %s. Did you forgot return statement?',
+            ResponseInterface::class,
+            Serializable::class
+        ));
     }
 }

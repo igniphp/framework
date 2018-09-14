@@ -12,11 +12,5 @@ use Igni\Application\Application;
  */
 interface OnRunListener
 {
-    /**
-     * Keeps on-run listener logic.
-     *
-     * @param Application $application
-     * @return mixed
-     */
-    public function onRun(Application $application);
+    public function onRun(Application $application): void;
 }

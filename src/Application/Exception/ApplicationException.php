@@ -7,11 +7,6 @@ use Igni\Exception\RuntimeException;
 
 class ApplicationException extends RuntimeException
 {
-    public static function forUnsupportedFeature(): self
-    {
-        return new self('This feature is not supported yet.');
-    }
-
     public static function forInvalidModule($module): self
     {
         $dumped = var_export($module, true);

@@ -57,12 +57,17 @@ Following example shows how you can use Igni without build in webserver:
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 
+use Igni\Application\HttpApplication;
+use Igni\Network\Http\Response;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+
 // Setup application
-$application = new Igni\Http\Application();
+$application = new HttpApplication();
 
 // Define routing
-$application->get('/hello/{name}', function (\Psr\Http\Message\ServerRequestInterface $request) : \Psr\Http\Message\ResponseInterface {
-    return \Igni\Http\Response::fromText("Hello {$request->getAttribute('name')}");
+$application->get('/hello/{name}', function (ServerRequestInterface $request): ResponseInterface {
+    return Response::asText("Hello {$request->getAttribute('name')}");
 });
 
 // Run the application
@@ -78,14 +83,20 @@ Similar approach is taken when build-in server comes in place:
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 
+use Igni\Application\HttpApplication;
+use Igni\Network\Http\Response;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Igni\Network\Server\HttpServer;
+
 // Setup application and routes
-$application = new Igni\Http\Application();
-$application->get('/hello/{name}', function (\Psr\Http\Message\ServerRequestInterface $request) : \Psr\Http\Message\ResponseInterface {
-    return \Igni\Http\Response::fromText("Hello {$request->getAttribute('name')}");
+$application = new HttpApplication();
+$application->get('/hello/{name}', function (ServerRequestInterface $request): ResponseInterface {
+    return Response::asText("Hello {$request->getAttribute('name')}");
 });
 
 // Run with the server
-$application->run(new Igni\Http\Server());
+$application->run(new HttpServer());
 ```
 
 Server instance is created and passed to application's `run` method.
@@ -110,7 +121,7 @@ Here are some examples:
 
 ```php
 <?php
-use Igni\Http\Router\Route;
+use Igni\Network\Http\Route;
 
 // Matches following get requests: /users/42, /users/1, but not /users/me 
 $application->get('/users/{id<\d+>}', function() {...});
@@ -152,25 +163,29 @@ Full example:
 // Include composer's autoloader.
 require_once __DIR__.'/vendor/autoload.php';
 
-$application = new Igni\Http\Application();
-$application->get('/hello/{name}', function ($request) {
-    return Igni\Http\Response::fromText("Hello: {$request->getAttribute('name')}");
+use Igni\Application\HttpApplication;
+use Igni\Network\Http\Response;
+use Psr\Http\Message\ServerRequestInterface;
+
+$application = new HttpApplication();
+$application->get('/hello/{name}', function (ServerRequestInterface $request) {
+    return Response::asText("Hello: {$request->getAttribute('name')}");
 });
 $application->run();
 ```
 
-#### `Application::on(Route $route, callable $controller)`
+#### `HttpApplication::on(Route $route, callable $controller)`
 
 Makes `$controller` to listen on instance of the `$route`. 
 
-#### `Application::get(string $route, callable $controller)`
+#### `HttpApplication::get(string $route, callable $controller)`
 
 Makes `$controller` to listen on `$route` pattern on http `GET` request. 
 
 Should be used to **read** or **retrieve** resource. On success response should return `200` (OK) status code. 
 In case of error most often `404` (Not found) or `400` (Bad request) should be returned in the status code.
 
-#### `Application::post(string $route, callable $controller)`
+#### `HttpApplication::post(string $route, callable $controller)`
 
 Makes `$controller` to listen on `$route` pattern on http `POST` request.
 
@@ -178,7 +193,7 @@ Should be used to **create** new resources (can be also used as a wild card verb
 On successful creation, response should return `201` (created) or `202` (accepted) status code.
 In case of error most often `406` (not acceptable), `409` (conflict) `413` (request entity too large)
 
-#### `Application::put(string $route, callable $controller)`
+#### `HttpApplication::put(string $route, callable $controller)`
 
 Makes `$controller` to listen on `$route` pattern on http `PUT` request.
 
@@ -186,24 +201,24 @@ Should be used to **update** a specific resource (by an identifier) or a collect
 Can also be used to create a specific resource if the resource identifier is known before-hand.
 Response code scenario is same as `post` method with additional `404` if resource to update was not found.
 
-#### `Application::patch(string $route, callable $controller)`
+#### `HttpApplication::patch(string $route, callable $controller)`
 
 Makes `$controller` to listen on `$route` pattern on http `PATCH` request.
 
 As `patch` should be used for **modify** resource. The difference is that `patch` request 
 can contain only the changes to the resource, not the complete resource as `put` or `post`.
 
-#### `Application::delete(string $route, callable $controller)`
+#### `HttpApplication::delete(string $route, callable $controller)`
 
 Makes `$controller` to listen on `$route` pattern on http `DELETE` request.
 
 Should be used to **delete** resource.
 
-#### `Application::options(string $route, callable $controller)`
+#### `HttpApplication::options(string $route, callable $controller)`
 
 Makes `$controller` to listen on `$route` pattern on http `OPTIONS` request.
 
-#### `Application::head(string $route, callable $controller)`
+#### `HttpApplication::head(string $route, callable $controller)`
 
 Makes `$controller` to listen on `$route` pattern on http `HEAD` request.
 
@@ -221,7 +236,7 @@ In Igni middleware can be any callable that accepts `\Psr\Http\Message\ServerReq
 and returns valid instance of `\Psr\Http\Message\ResponseInterface` or any class/object that implements `\Psr\Http\Server\MiddlewareInterface` interface.
 
 You can add as many middleware as you want, and they are triggered in the same order as you add them. 
-In fact even `Igni\Http\Application` is a middleware itself which is automatically added at the end of the pipe.
+In fact even `Igni\Http\HttpApplication` is a middleware itself which is automatically added at the end of the pipe.
 
 #### Example
 ```php
@@ -233,6 +248,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Igni\Application\HttpApplication;
 
 class BenchmarkMiddleware implements MiddlewareInterface
 {
@@ -247,7 +263,7 @@ class BenchmarkMiddleware implements MiddlewareInterface
     }
 }
 
-$application = new Igni\Http\Application();
+$application = new HttpApplication();
 
 // Attach custom middleware instance.
 $application->use(new BenchmarkMiddleware());
@@ -281,36 +297,37 @@ features for the application:
     - `Igni\Application\Providers\ConfigProvider` 
     - `Igni\Application\Providers\ControllerProvider` 
     - `Igni\Application\Providers\ServiceProvider` 
+    - `Igni\Application\Providers\MiddlewareProvider` 
 
 Example:
 ```php
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 
-use Igni\Application\Controller\ControllerAggregate;
+use Igni\Application\ControllerAggregator;
 use Igni\Application\Providers\ControllerProvider;
-use Igni\Http\Application;
-use Igni\Http\Response;
-use Igni\Http\Route;
+use Igni\Network\Http\Response;
+use Igni\Network\Http\Route;
+use Igni\Application\HttpApplication;
 
 /**
  * Module definition.
  */
 class SimpleModule implements ControllerProvider
 {
-    public function provideControllers(ControllerAggregate $controllers): void
+    public function provideControllers(ControllerAggregator $controllers): void
     {
         // Add controller that greets client when /hello/{name} URI is requested
-        $controllers->add(function ($request) {
-            return Response::fromText("Hello {$request->getAttribute('name')}!");
+        $controllers->register(function ($request) {
+            return Response::asText("Hello {$request->getAttribute('name')}!");
         }, Route::get('/hello/{name}'));
     }
 }
 
-$application = new Application();
+$application = new HttpApplication();
 
 // Extend application with the module.
-$application->extend(\SimpleModule::class);
+$application->extend(SimpleModule::class);
 
 // Run the application.
 $application->run();
@@ -360,13 +377,15 @@ require_once __DIR__.'/vendor/autoload.php';
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Igni\Http\Route;
+use Igni\Network\Http\Route;
+use Igni\Application\Http\Controller;
+use Igni\Network\Http\Response;
 
-class WelcomeUserController implements Igni\Http\Controller
+class WelcomeUserController implements Controller
 {
     public function __invoke(ServerRequestInterface $request): ResponseInterface 
     {
-        return \Igni\Http\Response::fromText("Hi {$request->getAttribute('name')}!");
+        return Response::asText("Hi {$request->getAttribute('name')}!");
     }
     
     public static function getRoute(): Route 
@@ -377,7 +396,7 @@ class WelcomeUserController implements Igni\Http\Controller
 ```
 
 Controller can be registered either in your [module file](../examples/Modules/SimpleModule.php) 
-or simply by calling `add` method on application's controller aggregate:
+or simply by calling `register` method on application's controller aggregate:
 
 ```php
 $application->getControllerAggregate()->add(WelcomeUserController::class);
@@ -391,41 +410,41 @@ For information how to work with PSR-7 [read this](https://www.php-fig.org/psr/p
 
 ## The Response
 Igni's controllers and middleware must return valid PSR-7 response object. 
-Igni's `Igni\Http\Response` class provides factories methods to simplify response creation.
+Igni's `Igni\Network\Http\Response` class provides factories methods to simplify response creation.
 
 #### `Response::empty(int $status = 200, array $headers = [])`
 
 Creates empty PSR-7 response object.
 
-#### `Response::fromText(string $text, int $status = 200, array $headers = [])`
+#### `Response::asText(string $text, int $status = 200, array $headers = [])`
 
 Creates PSR-7 request with content type set to `text/plain` and body containing passed `$text`
 
-#### `Response::fromJson($data, int $status = 200, array $headers = [])`
+#### `Response::asJson($data, int $status = 200, array $headers = [])`
 
 Creates PSR-7 request with content type set to `application/json` and body containing json data.
 `$data` can be array or `\JsonSerializable` instance.
 
-#### `Response::fromHtml(string $html, int $status = 200, array $headers = [])`
+#### `Response::asHtml(string $html, int $status = 200, array $headers = [])`
 
 Creates PSR-7 request with content type set to `text/html` and body containing passed html.
 
-#### `Response::fromXml($data, int $status = 200, array $headers = [])`
+#### `Response::asXml($data, int $status = 200, array $headers = [])`
 
 Creates PSR-7 request with content type set to `application/xml` and body containing xml string.
 `$data` can be `\SimpleXMLElement`, `\DOMDocument` or just plain string.
 
 ## Error handling
-Igni provides default error handler (`\Igni\Http\Middleware\ErrorMiddleware`) so if anything goes 
+Igni provides default error handler (`\Igni\Network\Http\Middleware\ErrorMiddleware`) so if anything goes 
 wrong in your application the error will not be directly propagated to the client layer unless it
 is a fatal error (fatals cannot be catched nor handled).
 
 If you intend to propagate custom error for your clients, you have two options:
-- Custom exception classes implementing `\Igni\Http\Exception\HttpException`
+- Custom exception classes implementing `\Igni\Network\Exception\HttpException`
 - Provide custom error handling middleware
 
 ### Custom Exceptions 
-All exceptions that implement `\Igni\Http\Exception\HttpException` are catch by default error handler and used
+All exceptions that implement `\Igni\Network\Exception\HttpException` are catch by default error handler and used
 to generate response for your clients:
 
 ```php
@@ -433,25 +452,22 @@ to generate response for your clients:
 // Include composer's autoloader.
 require_once __DIR__.'/vendor/autoload.php';
 
-use Igni\Http\Exception\HttpException;
+use Igni\Network\Exception\HttpException;
+use Psr\Http\Message\ResponseInterface;
+use Igni\Network\Http\Response;
+use Igni\Application\HttpApplication;
 
 class NotFoundException extends \RuntimeException implements HttpException
 {
-    public function getHttpStatusCode() 
-    {
-        return 404;
-    }
-    
-    public function getHttpBody() 
-    {
-        return json_encode([
+    public function toResponse(): ResponseInterface {
+        return Response::asJson([
             'error_message' => $this->getMessage(),    
-        ]);
+        ], 404);
     }
     
 }
 
-$application = new Igni\Http\Application();
+$application = new HttpApplication();
 $application->get('/article/{id}', function() {
     throw new NotFoundException('Article with given id does not exists');
 });
@@ -476,6 +492,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Igni\Network\Http\Response;
+use Igni\Application\HttpApplication;
 
 class CustomErrorHandler implements MiddlewareInterface
 {
@@ -484,14 +502,14 @@ class CustomErrorHandler implements MiddlewareInterface
         try {
             $response = $next->handle($request);
         } catch (Throwable $throwable) {
-            $response = \Igni\Http\Response::fromText('Custom error message', $status = 500);
+            $response = Response::asText('Custom error message', $status = 500);
         }
         
         return $response;
     }
 }
 
-$application = new Igni\Http\Application();
+$application = new HttpApplication();
 $application->use(new CustomErrorHandler());
 
 // Run the application.
@@ -510,18 +528,21 @@ consider following example:
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Igni\Http\Route;
+use Igni\Network\Http\Route;
+use Igni\Application\Http\Controller;
+use Igni\Network\Http\Response;
+use Igni\Network\Http\ServerRequest;
 
-class WelcomeUserController implements Igni\Http\Controller
+class WelcomeUserController implements Controller
 {
     public function __invoke(ServerRequestInterface $request): ResponseInterface 
     {
-        return \Igni\Http\Response::fromText("Hi {$request->getAttribute('name')}!");
+        return Response::asText("Hi {$request->getAttribute('name')}!");
     }
     
     public static function getRoute(): Route 
     {
-        return \Igni\Http\Router\Route::get('hi/{name}');
+        return Route::get('hi/{name}');
     }
 }
 
@@ -530,7 +551,7 @@ final class WelcomeUserControllerTest extends TestCase
     public function testWelcome(): void
     {
         $controller = new WelcomeUserController();
-        $response = $controller(\Igni\Http\ServerRequest::fromUri('/hi/Tom'));
+        $response = $controller(new ServerRequest('/hi/Tom'));
         
         self::assertSame('Hi Tom!', (string) $response->getBody());
         self::assertSame(200, $response->getStatusCode());
@@ -573,7 +594,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SymfonyDependencyInjectionModule implements ServiceProvider, OnRunListener
 {
-    public function onRun(Application $application) 
+    public function onRun(Application $application): void 
     {
         /** @var ContainerBuilder $container */
         $container = $application->getContainer();
@@ -590,123 +611,37 @@ class SymfonyDependencyInjectionModule implements ServiceProvider, OnRunListener
 }
 
 $containerBuilder = new ContainerBuilder();
-$application = new Igni\Http\Application($containerBuilder);
+$application = new Igni\Application\HttpApplication($containerBuilder);
 $application->use(new SymfonyDependencyInjectionModule());
 
 // Run the application.
 $application->run();
 ```
 
-
-## Igni's server
-
-Igni is shipped with an async non-blocking IO, multiple process HTTP server. 
-The server requires `swoole` extension to be installed and enabled, 
-more information about swoole can be found [here](https://www.swoole.co.uk).
-
-### Installation
-
-Linux users:
-
-```
-pecl install swoole
-```
-
-Mac users with homebrew:
-
-```
-brew install swoole
-```
-or:
-```
-brew install homebrew/php/php71-swoole
-```
-
-### Basic Usage
+## Igni server based on swoole
 
 ```php
 <?php
-// Autoloader.
 require_once __DIR__.'/vendor/autoload.php';
 
-// Create server instance.
-$server = new \Igni\Http\Server();
-$server->start();
-```
+use Igni\Application\HttpApplication;
+use Igni\Network\Http\Response;
+use Igni\Network\Server\HttpServer;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-### Listeners
+// Setup server
+$server = new HttpServer();
 
-Igni http server uses event-driven model that makes it easy to scale and extend.
+// Setup application and routes
+$application = new HttpApplication();
+$application->get('/hello/{name}', function (ServerRequestInterface $request) : ResponseInterface {
+    return Response::asText("Hello {$request->getAttribute('name')}");
+});
 
-There are five type of events available, each of them extends `Igni\Http\Server\Listener` interface:
+// Run the server, it should listen on localhost:80
+$application->run($server);
 
- - `Igni\Http\Server\OnStart` fired when server starts
- - `Igni\Http\Server\OnStop` fired when server stops
- - `Igni\Http\Server\OnConnect` fired when new client connects to the server
- - `Igni\Http\Server\OnClose` fired when connection with the client is closed
- - `Igni\Http\Server\OnRequest` fired when new request is dispatched
- 
- ```php
- <?php
- // Autoloader.
- require_once __DIR__.'/vendor/autoload.php';
- 
- // Create server instance.
- $server = new \Igni\Http\Server();
- 
- // Each request will retrieve 'Hello' response
- $server->addListener(new class implements \Igni\Http\Server\OnRequest {
-     public function onRequest(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface {
-        return \Igni\Http\Response::fromText('Hello');
-     }
- });
- $server->start();
- ```
-
-### Configuration
-
-Server can be easily configured with `Igni\Http\Server\HttpConfiguration` class.
-
-Please consider following example:
-```php
-<?php
-// Autoloader.
-require_once __DIR__.'/vendor/autoload.php';
-
-// Listen on localhost at port 80.
-$configuration = new \Igni\Http\Server\HttpConfiguration('0.0.0.0', 80);
-
-// Create server instance.
-$server = new \Igni\Http\Server($configuration);
-$server->start();
-```
-
-##### Enabling ssl support
-```php
-<?php
-// Autoloader.
-require_once __DIR__.'/vendor/autoload.php';
-
-$configuration = new \Igni\Http\Server\HttpConfiguration();
-$configuration->enableSsl($certFile, $keyFile);
-
-// Create server instance.
-$server = new \Igni\Http\Server($configuration);
-$server->start();
-```
-
-##### Running server as a daemon
-```php
-<?php
-// Autoloader.
-require_once __DIR__.'/vendor/autoload.php';
-
-$configuration = new \Igni\Http\Server\HttpConfiguration();
-$configuration->enableDaemon($pidFile);
-
-// Create server instance.
-$server = new \Igni\Http\Server($configuration);
-$server->start();
 ```
 
 ## External webserver
@@ -783,18 +718,20 @@ PHP ships with a built-in webserver for development. This server allows you to r
 <?php
 require_once __DIR__.'/vendor/autoload.php';
 
+use Igni\Network\Http\Response;
+use Igni\Application\HttpApplication;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+
 // Setup application and routes
-$application = new Igni\Http\Application();
-$application->get('/hello/{name}', function (\Psr\Http\Message\ServerRequestInterface $request) : \Psr\Http\Message\ResponseInterface {
-    return \Igni\Http\Response::fromText("Hello {$request->getAttribute('name')}");
+$application = new HttpApplication();
+$application->get('/hello/{name}', function (ServerRequestInterface $request): ResponseInterface {
+    return Response::asText("Hello {$request->getAttribute('name')}");
 });
 
 // Run with the server
-if (php_sapi_name() == 'cli-server') {
-    $application->run();
-} else {
-    $application->run(new Igni\Http\Server());
-}
+$application->run();
+
 ```
 
 Assuming your front controller is at ./index.php, you can start the server using the following command:

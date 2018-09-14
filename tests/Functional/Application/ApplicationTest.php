@@ -4,7 +4,7 @@ namespace Igni\Tests\Functional\Application;
 
 use Igni\Application\Application;
 use Igni\Application\Config;
-use Igni\Application\Controller\ControllerAggregate;
+use Igni\Application\ControllerAggregator;
 use Igni\Application\Exception\ApplicationException;
 use Igni\Application\Listeners\OnBootListener;
 use Igni\Application\Providers\ControllerProvider;
@@ -24,7 +24,7 @@ final class ApplicationTest extends TestCase
     {
         $application = new NullApplication();
         $application->extend(new class implements OnBootListener {
-            public function onBoot(Application $application)
+            public function onBoot(Application $application): void
             {
                 $application->onBoot = true;
             }
@@ -35,7 +35,6 @@ final class ApplicationTest extends TestCase
         self::assertTrue($application->onBoot);
         self::assertFalse($application->onRun);
         self::assertFalse($application->onShutDown);
-        self::assertTrue($application->getControllerAggregate()->has('test_controller'));
     }
 
     public function testExtendWithInvalidModule(): void
@@ -55,8 +54,8 @@ final class ApplicationTest extends TestCase
 
 class ApplicationModule implements ControllerProvider
 {
-    public function provideControllers(ControllerAggregate $controllers): void
+    public function provideControllers(ControllerAggregator $controllers): void
     {
-        $controllers->add(function() {}, 'test_controller');
+        $controllers->register(function() {}, 'test_controller');
     }
 }
