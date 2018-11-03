@@ -2,8 +2,8 @@
 
 namespace Igni\Application\Providers;
 
-use Psr\Container\ContainerInterface;
 use Igni\Container\ServiceLocator;
+use Psr\Container\ContainerInterface;
 
 /**
  * Can be implemented by module to register additional services.
