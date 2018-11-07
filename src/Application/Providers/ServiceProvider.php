@@ -2,6 +2,7 @@
 
 namespace Igni\Application\Providers;
 
+use Igni\Container\ServiceLocator;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -12,7 +13,7 @@ use Psr\Container\ContainerInterface;
 interface ServiceProvider
 {
     /**
-     * @param ContainerInterface $container
+     * @param ServiceLocator|ContainerInterface $container
      */
     public function provideServices(ContainerInterface $container): void;
 }
