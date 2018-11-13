@@ -16,7 +16,7 @@ class Controller
     }
 }
 
-$server = new HttpServer(new Configuration('0.0.0.0', 8080));
+$server = new HttpServer(new Configuration(8080, '0.0.0.0'));
 $application = new HttpApplication();
 
 $application->get('/hello', new Controller());

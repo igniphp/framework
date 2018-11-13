@@ -13,7 +13,7 @@ use Igni\Network\Server\HttpServer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-$configuration = new Configuration('0.0.0.0', 8080);
+$configuration = new Configuration(8080, '0.0.0.0');
 $configuration->enableDaemon(__DIR__ . '/igni.pid');
 
 // Setup server
