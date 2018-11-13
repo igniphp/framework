@@ -9,7 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 // Setup server
-$server = new HttpServer(new Configuration('0.0.0.0', 8080));
+$server = new HttpServer(new Configuration(8080, '0.0.0.0'));
 
 // Setup application and routes
 $application = new HttpApplication();

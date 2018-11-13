@@ -23,5 +23,5 @@ $application->extend(SimpleModule::class);
 if (php_sapi_name() == 'cli-server') {
     $application->run();
 } else {
-    $application->run(new HttpServer(new Configuration('0.0.0.0', 8080)));
+    $application->run(new HttpServer(new Configuration(8080, '0.0.0.0')));
 }
