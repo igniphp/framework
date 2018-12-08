@@ -2,21 +2,21 @@
 
 namespace Igni\Tests\Fixtures;
 
-use Igni\Application\Application;
 use Igni\Application\Controller;
 use Igni\Application\ControllerAggregator;
 use Igni\Application\Http\MiddlewareAggregator;
 use Igni\Application\HttpApplication;
 use Igni\Container\ServiceLocator;
+use Igni\Network\Server\HttpServer;
 use Psr\Http\Server\MiddlewareInterface;
 
-class NullApplication extends Application
+class NullApplication extends HttpApplication
 {
     public $onBoot = false;
     public $onShutDown = false;
     public $onRun = false;
 
-    public function run(): void
+    public function run(HttpServer $server = null): void
     {
         $this->handleOnBootListeners();
         $this->initialize();

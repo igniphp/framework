@@ -7,6 +7,7 @@ use Igni\Application\Exception\ControllerException;
 use Igni\Application\Http\Controller;
 use Igni\Application\Http\MiddlewareAggregator;
 use Igni\Application\Http\GenericRouter;
+use Igni\Application\Providers\MiddlewareProvider;
 use Igni\Network\Http\Middleware\CallableMiddleware;
 use Igni\Network\Http\Middleware\ErrorMiddleware;
 use Igni\Network\Http\Middleware\MiddlewarePipe;
@@ -364,6 +365,15 @@ class HttpApplication extends Application implements
         }
 
         return $this->pipeline = $this->composeMiddlewarePipe();
+    }
+
+    protected function initializeModule(&$module): void
+    {
+        parent::initializeModule($module);
+
+        if ($module instanceof MiddlewareProvider) {
+            $module->provideMiddleware($this->getMiddlewareAggregator());
+        }
     }
 
     private function composeMiddlewarePipe(): MiddlewarePipe
