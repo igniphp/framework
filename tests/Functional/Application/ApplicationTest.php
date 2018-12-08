@@ -6,8 +6,10 @@ use Igni\Application\Application;
 use Igni\Application\Config;
 use Igni\Application\ControllerAggregator;
 use Igni\Application\Exception\ApplicationException;
+use Igni\Application\Http\MiddlewareAggregator;
 use Igni\Application\Listeners\OnBootListener;
 use Igni\Application\Providers\ControllerProvider;
+use Igni\Application\Providers\MiddlewareProvider;
 use Igni\Tests\Fixtures\NullApplication;
 use PHPUnit\Framework\TestCase;
 
@@ -30,8 +32,13 @@ final class ApplicationTest extends TestCase
             }
         });
         $application->extend(ApplicationModule::class);
+        $application->extend(MiddlewareModule::class);
         $application->run();
 
+        $middleware = &$application->getMiddlewareAggregator()->middleware;
+
+        self::assertTrue(isset($middleware[0]));
+        self::assertSame('called', $middleware[0]());
         self::assertTrue($application->onBoot);
         self::assertFalse($application->onRun);
         self::assertFalse($application->onShutDown);
@@ -57,5 +64,15 @@ class ApplicationModule implements ControllerProvider
     public function provideControllers(ControllerAggregator $controllers): void
     {
         $controllers->register(function() {}, 'test_controller');
+    }
+}
+
+class MiddlewareModule implements MiddlewareProvider
+{
+    public function provideMiddleware(MiddlewareAggregator $aggregate): void
+    {
+        $aggregate->use(function () {
+            return 'called';
+        });
     }
 }

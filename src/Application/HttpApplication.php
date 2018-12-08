@@ -347,6 +347,16 @@ class HttpApplication extends Application implements
         return $this;
     }
 
+    /**
+     * Middleware aggregator is used to register application's middlewares.
+     *
+     * @return MiddlewareAggregator
+     */
+    public function getMiddlewareAggregator(): MiddlewareAggregator
+    {
+        return $this;
+    }
+
     protected function getMiddlewarePipe(): MiddlewarePipe
     {
         if ($this->pipeline) {

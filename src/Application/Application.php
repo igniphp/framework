@@ -3,12 +3,14 @@
 namespace Igni\Application;
 
 use Igni\Application\Exception\ApplicationException;
+use Igni\Application\Http\MiddlewareAggregator;
 use Igni\Application\Listeners\OnBootListener;
 use Igni\Application\Listeners\OnErrorListener;
 use Igni\Application\Listeners\OnRunListener;
 use Igni\Application\Listeners\OnShutDownListener;
 use Igni\Application\Providers\ConfigProvider;
 use Igni\Application\Providers\ControllerProvider;
+use Igni\Application\Providers\MiddlewareProvider;
 use Igni\Application\Providers\ServiceProvider;
 use Igni\Container\DependencyResolver;
 use Igni\Container\ServiceLocator;
@@ -100,6 +102,12 @@ abstract class Application
     abstract public function getControllerAggregator(): ControllerAggregator;
 
     /**
+     * Middleware aggregator is used to register application's middlewares.
+     * @return MiddlewareAggregator
+     */
+    abstract public function getMiddlewareAggregator(): MiddlewareAggregator;
+
+    /**
      * @return Config
      */
     public function getConfig(): Config
@@ -179,6 +187,10 @@ abstract class Application
 
         if ($module instanceof ServiceProvider) {
             $module->provideServices($this->getContainer());
+        }
+
+        if ($module instanceof MiddlewareProvider) {
+            $module->provideMiddleware($this->getMiddlewareAggregator());
         }
     }
 }
