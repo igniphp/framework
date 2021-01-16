@@ -12,7 +12,7 @@ class Controller
 {
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
-        throw new \Exception("Dupa");
+        throw new \Exception("Error has occured");
     }
 }
 
